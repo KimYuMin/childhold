@@ -7,5 +7,5 @@ import retrofit2.http.Query
 
 interface DriverService {
     @GET("child_list.php")
-    fun getChildList(@Query("driver_id") driverId: Int): Observable<Array<Child>>
+    fun getChildList(@Query("driver_id") driverId: Int): Observable<ArrayList<Child>>
 }
