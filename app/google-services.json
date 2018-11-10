@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "471402364823",
+    "firebase_url": "https://childhold-1540445936164.firebaseio.com",
+    "project_id": "childhold-1540445936164",
+    "storage_bucket": "childhold-1540445936164.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:471402364823:android:cacd5027299f76b6",
+        "android_client_info": {
+          "package_name": "com.example.yuminkim.childhold"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "471402364823-qac63mrt0p48ruegnpsap0iddas2ujdl.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.yuminkim.childhold",
+            "certificate_hash": "39c9d493617051e4fe7252ab8cfa4eee5b006a07"
+          }
+        },
+        {
+          "client_id": "471402364823-qsbs8ude0m3grv0gb6t7bnv3fugnjf1r.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCMM5_AwqFroQP4TG2T21Bq_yA92QIlEeE"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "471402364823-qsbs8ude0m3grv0gb6t7bnv3fugnjf1r.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
