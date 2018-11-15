@@ -35,10 +35,15 @@ public class DriverActivity extends Activity {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<ArrayList<Child>>() {
                     @Override
-                    public void accept(ArrayList<Child> children) throws Exception {
-                        for (Child c: children) {
+                    public void accept(ArrayList<Child> children) {
+                        for (Child c : children) {
                             Log.d("child", "name : " + c.getName());
                         }
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        //TODO: handle error
                     }
                 });
     }
@@ -49,10 +54,15 @@ public class DriverActivity extends Activity {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<ArrayList<LatLng>>() {
                     @Override
-                    public void accept(ArrayList<LatLng> latLngs) throws Exception {
+                    public void accept(ArrayList<LatLng> latLngs) {
                         for (LatLng l : latLngs) {
                             Log.d("latlng", "lat : " + l.getLat());
                         }
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) throws Exception {
+                        //TODO: handle error
                     }
                 });
     }
