@@ -81,6 +81,7 @@ public class DriverActivity extends Activity {
     }
 
     private void sendPushNotification() {
+        //FIXME: Push from me modify send to other
         OSPermissionSubscriptionState status = OneSignal.getPermissionSubscriptionState();
         String userId = status.getSubscriptionStatus().getUserId();
         boolean isSubscribed = status.getSubscriptionStatus().getSubscribed();
