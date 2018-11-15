@@ -4,10 +4,7 @@ import com.example.yuminkim.childhold.model.Child
 import com.example.yuminkim.childhold.model.LatLng
 import com.example.yuminkim.childhold.network.model.BaseResponse
 import io.reactivex.Observable
-import retrofit2.http.Field
-import retrofit2.http.GET
-import retrofit2.http.POST
-import retrofit2.http.Query
+import retrofit2.http.*
 
 interface DriverService {
     @GET("child_list.php")
@@ -17,6 +14,7 @@ interface DriverService {
     fun getDriveRoute(@Query("driver_id") driverId: Int): Observable<ArrayList<LatLng>>
 
     //FIXME: User service를 만들어서 옮기자 (운전자, 부모 둘다 사용해야함)
+    @FormUrlEncoded
     @POST("update_google_id.php")
     fun updateUserDeviceId(@Field("user_type") userType: String,
                            @Field("user_id") userId: String,

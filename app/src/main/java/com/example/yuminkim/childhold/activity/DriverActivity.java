@@ -9,6 +9,7 @@ import com.example.yuminkim.childhold.R;
 import com.example.yuminkim.childhold.model.Child;
 import com.example.yuminkim.childhold.model.LatLng;
 import com.example.yuminkim.childhold.network.ApiService;
+import com.example.yuminkim.childhold.network.model.BaseResponse;
 import com.onesignal.OSPermissionSubscriptionState;
 import com.onesignal.OneSignal;
 
@@ -26,6 +27,7 @@ public class DriverActivity extends Activity {
 
     private Disposable disposable;
     private Disposable disposable2;
+    private Disposable disposable3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,6 +86,7 @@ public class DriverActivity extends Activity {
         //FIXME: Push from me modify send to other
         OSPermissionSubscriptionState status = OneSignal.getPermissionSubscriptionState();
         String userId = status.getSubscriptionStatus().getUserId();
+        updateDeviceId(userId);
         boolean isSubscribed = status.getSubscriptionStatus().getSubscribed();
 
         if (!isSubscribed)
@@ -95,10 +98,27 @@ public class DriverActivity extends Activity {
                     "'headings': {'en': 'Notification Title'}, " +
                     "'big_picture': 'http://i.imgur.com/DKw1J2F.gif'}");
             OneSignal.postNotification(notificationContent, null);
+            Log.d("userid", "usr-id : " + userId);
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
 
+    private void updateDeviceId(String deviceId) {
+        disposable3 = ApiService.getDRIVER_SERVCE().updateUserDeviceId("1","parent", deviceId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<BaseResponse>() {
+                    @Override
+                    public void accept(BaseResponse baseResponse) {
+                        Log.d("status", "status : " + baseResponse.status);
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) {
+                        Log.d("fail","fail");
+                    }
+                });
     }
 
     @Override
@@ -106,5 +126,6 @@ public class DriverActivity extends Activity {
         super.onPause();
         disposable.dispose();
         disposable2.dispose();
+        //disposable3.dispose();
     }
 }
