@@ -9,6 +9,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -20,10 +21,12 @@ import com.example.yuminkim.childhold.model.LatLng;
 import com.example.yuminkim.childhold.network.ApiService;
 
 import com.example.yuminkim.childhold.network.model.BaseResponse;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.UiSettings;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.onesignal.OSPermissionSubscriptionState;
 import com.onesignal.OneSignal;
 
@@ -58,8 +61,6 @@ public class DriverActivity extends Activity implements OnMapReadyCallback {
 
         childArrayList = new ArrayList<>();
         setContentView(R.layout.activity_driver);
-        getChildList(1);
-        getDriverRoute(1);
         initMap();
 
 
@@ -75,6 +76,15 @@ public class DriverActivity extends Activity implements OnMapReadyCallback {
                 childlist_view = findViewById(R.id.child_list);
                 childListAdapter = new ChildListAdapter(DriverActivity.this, childArrayList);
                 childlist_view.setAdapter(childListAdapter);
+                childlist_view.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        LatLng src = childArrayList.get(position).getLatLng();
+                        com.google.android.gms.maps.model.LatLng latLng =
+                                new com.google.android.gms.maps.model.LatLng(src.getLat(), src.getLng());
+                        map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16));
+                    }
+                });
             }
         });
     }
@@ -132,6 +142,8 @@ public class DriverActivity extends Activity implements OnMapReadyCallback {
         map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         UiSettings uiSettings = map.getUiSettings();
         uiSettings.setZoomControlsEnabled(true);
+        // child list 를 부르고 아이의 위치를 가져와야 맵을 줌하고 마커를 그릴 수 있음
+        getChildList(1);
     }
 
 
@@ -142,9 +154,25 @@ public class DriverActivity extends Activity implements OnMapReadyCallback {
                 .subscribe(new Consumer<ArrayList<Child>>() {
                     @Override
                     public void accept(ArrayList<Child> children) throws Exception {
+                        double lat = 0, lng = 0;
                         for (Child c: children) {
-                            Log.d("child", "name : " + c.getLatLng().getLat());
+                            lat += c.getLatLng().getLat();
+                            lng += c.getLatLng().getLng();
                             childArrayList.add(c);
+                            map.addMarker( new MarkerOptions().position(
+                                    new com.google.android.gms.maps.model.LatLng(
+                                            c.getLatLng().getLat(),
+                                            c.getLatLng().getLng()
+                                    )
+                                ).title(String.format("%d", c.getIdx()))
+                            );
+                        }
+                        center = new com.google.android.gms.maps.model.LatLng(
+                                lat / (double) children.size(),
+                                lng / (double) children.size()
+                        );
+                        if (map != null) {
+                            postMapProcess();
                         }
                     }
                 }, new Consumer<Throwable>() {
@@ -155,23 +183,8 @@ public class DriverActivity extends Activity implements OnMapReadyCallback {
                 });
     }
 
-    private void getDriverRoute(int driverId) {
-        disposable2 = ApiService.getDRIVER_SERVICE().getDriveRoute(driverId)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<ArrayList<LatLng>>() {
-                    @Override
-                    public void accept(ArrayList<LatLng> latLngs) {
-                        for (LatLng l : latLngs) {
-                            Log.d("latlng", "lat : " + l.getLat());
-                        }
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) throws Exception {
-                        //TODO: handle error
-                    }
-                });
+    private void postMapProcess(){
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(center, 14));
     }
 
     private void sendPushNotification() {
@@ -190,7 +203,6 @@ public class DriverActivity extends Activity implements OnMapReadyCallback {
                     "'headings': {'en': 'Notification Title'}, " +
                     "'big_picture': 'http://i.imgur.com/DKw1J2F.gif'}");
             OneSignal.postNotification(notificationContent, null);
-            Log.d("userid", "usr-id : " + userId);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -216,8 +228,11 @@ public class DriverActivity extends Activity implements OnMapReadyCallback {
     @Override
     protected void onPause() {
         super.onPause();
-        disposable.dispose();
-        disposable2.dispose();
-        //disposable3.dispose();
+        if (disposable != null) {
+            disposable.dispose();
+        }
+        if (disposable2 != null) {
+            disposable2.dispose();
+        }
     }
 }

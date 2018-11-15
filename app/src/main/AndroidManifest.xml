@@ -16,6 +16,10 @@
         android:theme="@style/AppTheme">
 
         <activity android:name=".activity.LoginActivity">
+
+        </activity>
+        <activity android:name=".activity.MainActivity" />
+        <activity android:name=".activity.DriverActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <action android:name="android.intent.action.MAIN" />
@@ -23,8 +27,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.MainActivity" />
-        <activity android:name=".activity.DriverActivity" />
         <activity android:name=".activity.ParentActivity" />
 
 
