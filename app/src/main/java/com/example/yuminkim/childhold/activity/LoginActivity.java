@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -16,6 +17,8 @@ public class LoginActivity extends Activity {
     private Button loginButton;
     private EditText userTypeEditText;
     private EditText passwordEditText;
+    private String[] USER_TYPES_TEXT = {"운전자", "보호자"};
+    private String userType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,17 +49,28 @@ public class LoginActivity extends Activity {
     }
 
     private void showUserTypeWindow() {
-        ListPopupWindow popupWindow = new ListPopupWindow(this);
+        final ListPopupWindow popupWindow = new ListPopupWindow(this);
         popupWindow.setAdapter(
                 new ArrayAdapter<>(this,
                         android.R.layout.simple_dropdown_item_1line,
-                        new String[]{"운전자", "보호자"}
+                        USER_TYPES_TEXT
                 )
         );
         popupWindow.setHeight(480);
         popupWindow.setWidth(userTypeEditText.getMeasuredWidth());
         popupWindow.setAnchorView(userTypeEditText);
-
+        popupWindow.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                userTypeEditText.setText(USER_TYPES_TEXT[position]);
+                if (position == 0) {
+                    userType = "driver";
+                } else {
+                    userType = "parent";
+                }
+                popupWindow.dismiss();
+            }
+        });
         popupWindow.show();
     }
 }
