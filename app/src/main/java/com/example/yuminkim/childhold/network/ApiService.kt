@@ -26,6 +26,9 @@ class ApiService {
                 .build()
 
         @JvmStatic
-        val DRIVER_SERVCE = retrofit.create(DriverService::class.java)
+        val DRIVER_SERVICE = retrofit.create(DriverService::class.java)
+
+        @JvmStatic
+        val COMMON_SERVICE = retrofit.create(CommonService::class.java)
     }
 }

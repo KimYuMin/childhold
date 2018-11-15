@@ -45,7 +45,7 @@ public class DriverActivity extends Activity {
     }
 
     private void getChildList(int driverId) {
-        disposable = ApiService.getDRIVER_SERVCE().getChildList(driverId)
+        disposable = ApiService.getDRIVER_SERVICE().getChildList(driverId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<ArrayList<Child>>() {
@@ -64,7 +64,7 @@ public class DriverActivity extends Activity {
     }
 
     private void getDriverRoute(int driverId) {
-        disposable2 = ApiService.getDRIVER_SERVCE().getDriveRoute(driverId)
+        disposable2 = ApiService.getDRIVER_SERVICE().getDriveRoute(driverId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<ArrayList<LatLng>>() {
@@ -105,7 +105,7 @@ public class DriverActivity extends Activity {
     }
 
     private void updateDeviceId(String deviceId) {
-        disposable3 = ApiService.getDRIVER_SERVCE().updateUserDeviceId("1","parent", deviceId)
+        disposable3 = ApiService.getCOMMON_SERVICE().updateUserDeviceId("1","parent", deviceId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<BaseResponse>() {

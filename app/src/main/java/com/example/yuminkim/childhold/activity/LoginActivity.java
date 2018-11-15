@@ -3,6 +3,7 @@ package com.example.yuminkim.childhold.activity;
 import android.app.Activity;
 import android.os.Bundle;
 import android.text.InputType;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -11,6 +12,13 @@ import android.widget.EditText;
 import android.widget.ListPopupWindow;
 
 import com.example.yuminkim.childhold.R;
+import com.example.yuminkim.childhold.network.ApiService;
+import com.example.yuminkim.childhold.network.model.BaseResponse;
+
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 public class LoginActivity extends Activity {
 
@@ -19,6 +27,7 @@ public class LoginActivity extends Activity {
     private EditText passwordEditText;
     private String[] USER_TYPES_TEXT = {"운전자", "보호자"};
     private String userType;
+    private Disposable disposable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +44,7 @@ public class LoginActivity extends Activity {
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //TODO do login
+                doLogin();
             }
         });
 
@@ -72,5 +81,29 @@ public class LoginActivity extends Activity {
             }
         });
         popupWindow.show();
+    }
+
+    private void doLogin() {
+        String code = passwordEditText.getText().toString();
+        disposable = ApiService.getCOMMON_SERVICE().login(userType, code)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<String>() {
+                    @Override
+                    public void accept(String idx) {
+                        //TODO: idx를 받아왔으니 userType으로 나눠서 activity 이동시키기
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable) {
+                        Log.d("fail","fail");
+                    }
+                });
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        disposable.dispose();
     }
 }
