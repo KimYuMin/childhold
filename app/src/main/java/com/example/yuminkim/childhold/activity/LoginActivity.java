@@ -1,6 +1,7 @@
 package com.example.yuminkim.childhold.activity;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
@@ -21,6 +22,7 @@ import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
 public class LoginActivity extends Activity {
+    Button parent_btn, driver_btn;
 
     private Button loginButton;
     private EditText userTypeEditText;
@@ -105,5 +107,25 @@ public class LoginActivity extends Activity {
     protected void onPause() {
         super.onPause();
         disposable.dispose();
+
+//        parent_btn = (Button)findViewById(R.id.parent_button);
+//        parent_btn.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Intent intent = new Intent(LoginActivity.this, ParentActivity.class);
+//                startActivity(intent);
+//                finish();
+//            }
+//        });
+//
+//        driver_btn = (Button)findViewById(R.id.driver_button);
+//        driver_btn.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Intent intent = new Intent(LoginActivity.this, DriverActivity.class);
+//                startActivity(intent);
+//                finish();
+//            }
+//        });
     }
 }
