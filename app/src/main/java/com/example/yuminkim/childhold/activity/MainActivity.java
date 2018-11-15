@@ -7,6 +7,7 @@ import com.example.yuminkim.childhold.R;
 
 public class MainActivity extends Activity {
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
