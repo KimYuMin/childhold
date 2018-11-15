@@ -14,7 +14,7 @@ import android.widget.ListPopupWindow;
 
 import com.example.yuminkim.childhold.R;
 import com.example.yuminkim.childhold.network.ApiService;
-import com.example.yuminkim.childhold.network.model.BaseResponse;
+import com.example.yuminkim.childhold.network.model.LoginResponse;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -22,8 +22,6 @@ import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
 public class LoginActivity extends Activity {
-    Button parent_btn, driver_btn;
-
     private Button loginButton;
     private EditText userTypeEditText;
     private EditText passwordEditText;
@@ -90,11 +88,20 @@ public class LoginActivity extends Activity {
         disposable = ApiService.getCOMMON_SERVICE().login(userType, code)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<String>() {
+                .subscribe(new Consumer<LoginResponse>() {
                     @Override
-                    public void accept(String idx) {
-                        //TODO: idx를 받아왔으니 userType으로 나눠서 activity 이동시키기
-                    }
+                    public void accept(LoginResponse loginResponse) {
+                        //TODO: idx를 파라메터로 넘겨주자
+                        if (userType == "parent") {
+                            Intent intent = new Intent(LoginActivity.this, ParentActivity.class);
+                            startActivity(intent);
+                            finish();
+                        } else {
+                            Intent intent = new Intent(LoginActivity.this, DriverActivity.class);
+                            startActivity(intent);
+                            finish();
+                        }
+                     }
                 }, new Consumer<Throwable>() {
                     @Override
                     public void accept(Throwable throwable) {
@@ -106,26 +113,8 @@ public class LoginActivity extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
-        disposable.dispose();
-
-//        parent_btn = (Button)findViewById(R.id.parent_button);
-//        parent_btn.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Intent intent = new Intent(LoginActivity.this, ParentActivity.class);
-//                startActivity(intent);
-//                finish();
-//            }
-//        });
-//
-//        driver_btn = (Button)findViewById(R.id.driver_button);
-//        driver_btn.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Intent intent = new Intent(LoginActivity.this, DriverActivity.class);
-//                startActivity(intent);
-//                finish();
-//            }
-//        });
+        if (disposable != null) {
+            disposable.dispose();
+        }
     }
 }

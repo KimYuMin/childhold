@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".activity.LoginActivity"
-    android:background="@color/oragne">
+    android:background="@color/orange">
 
     <TextView
         android:layout_width="wrap_content"
@@ -59,7 +59,7 @@
         android:layout_marginLeft="20dp"
         android:layout_marginTop="59dp"
         android:layout_marginRight="20dp"
-        android:background="@color/oragne_deep"
+        android:background="@color/orange_deep"
         android:text="로그인" />
 
 

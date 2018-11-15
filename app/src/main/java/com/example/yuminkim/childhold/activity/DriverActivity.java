@@ -3,7 +3,6 @@ package com.example.yuminkim.childhold.activity;
 import android.Manifest;
 import android.app.Activity;
 import android.content.pm.PackageManager;
-import android.location.Geocoder;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -42,8 +41,6 @@ public class DriverActivity extends Activity implements OnMapReadyCallback {
     static int REQ_PERMISSION_MAP = 1000;
     MapFragment mapFr;
     GoogleMap map;
-    double myLat;
-    double myLng;
     Button drive_start_btn;
     ListView childlist_view;
     ChildListAdapter childListAdapter;
@@ -53,34 +50,31 @@ public class DriverActivity extends Activity implements OnMapReadyCallback {
     private Disposable disposable2;
     private Disposable disposable3;
 
+    private com.google.android.gms.maps.model.LatLng center;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        childArrayList = new ArrayList<Child>();
+        childArrayList = new ArrayList<>();
         setContentView(R.layout.activity_driver);
         getChildList(1);
         getDriverRoute(1);
-        Log.d("driver", "driveractivity");
         initMap();
 
 
-        drive_start_btn = (Button)findViewById(R.id.drive_start_btn);
+        drive_start_btn = findViewById(R.id.drive_start_btn);
         drive_start_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                LinearLayout driver_default_linear = (LinearLayout)findViewById(R.id.driver_default);
+                LinearLayout driver_default_linear = findViewById(R.id.driver_default);
                 driver_default_linear.setVisibility(View.GONE);
-                LinearLayout driver_drive_linear = (LinearLayout)findViewById(R.id.driver_drive);
+                LinearLayout driver_drive_linear = findViewById(R.id.driver_drive);
                 driver_drive_linear.setVisibility(View.VISIBLE);
 
-                childlist_view = (ListView)findViewById(R.id.child_list);
+                childlist_view = findViewById(R.id.child_list);
                 childListAdapter = new ChildListAdapter(DriverActivity.this, childArrayList);
-                Log.d("child list :", childArrayList.get(1).getName());
-                Log.d("child list :", childArrayList.get(1).getLatLng().toString());
                 childlist_view.setAdapter(childListAdapter);
-
-                //childlist_view.setAdapter(childListAdapter);
             }
         });
     }
