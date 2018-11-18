@@ -30,5 +30,8 @@ class ApiService {
 
         @JvmStatic
         val COMMON_SERVICE = retrofit.create(CommonService::class.java)
+
+        @JvmStatic
+        val PARENT_SERVICE = retrofit.create(ParentService::class.java)
     }
 }

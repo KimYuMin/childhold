@@ -4,11 +4,37 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activity.ParentActivity">
+    tools:context=".activity.ParentActivity"
+    android:orientation="vertical"
+    android:weightSum="5">
 
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Parent Activity"/>
+        android:layout_height="0dp"
+        android:layout_weight="3">
+        <fragment
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/parent_map"
+            android:name="com.google.android.gms.maps.MapFragment"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        android:orientation="vertical">
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="위치보기"
+            android:id="@+id/parent_location_btn"/>
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="아이안감"
+            android:id="@+id/parent_absent_btn"/>
+    </LinearLayout>
 
 </LinearLayout>
