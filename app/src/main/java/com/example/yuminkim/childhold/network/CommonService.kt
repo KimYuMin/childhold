@@ -15,5 +15,5 @@ interface CommonService {
     @POST("update_google_id.php")
     fun updateUserDeviceId(@Field("user_type") userType: String,
                            @Field("user_id") userId: String,
-                           @Field("device_Id") deviceId: String): Observable<BaseResponse>
+                           @Field("device_id") deviceId: String): Observable<BaseResponse>
 }
