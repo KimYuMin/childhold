@@ -187,44 +187,6 @@ public class DriverActivity extends Activity implements OnMapReadyCallback {
         map.animateCamera(CameraUpdateFactory.newLatLngZoom(center, 14));
     }
 
-    private void sendPushNotification() {
-        //FIXME: Push from me modify send to other
-        OSPermissionSubscriptionState status = OneSignal.getPermissionSubscriptionState();
-        String userId = status.getSubscriptionStatus().getUserId();
-        updateDeviceId(userId);
-        boolean isSubscribed = status.getSubscriptionStatus().getSubscribed();
-
-        if (!isSubscribed)
-            return;
-
-        try {
-            JSONObject notificationContent = new JSONObject("{'contents': {'en': 'The notification message or body'}," +
-                    "'include_player_ids': ['" + userId + "'], " +
-                    "'headings': {'en': 'Notification Title'}, " +
-                    "'big_picture': 'http://i.imgur.com/DKw1J2F.gif'}");
-            OneSignal.postNotification(notificationContent, null);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void updateDeviceId(String deviceId) {
-        disposable3 = ApiService.getCOMMON_SERVICE().updateUserDeviceId("1","parent", deviceId)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Consumer<BaseResponse>() {
-                    @Override
-                    public void accept(BaseResponse baseResponse) {
-                        Log.d("status", "status : " + baseResponse.status);
-                    }
-                }, new Consumer<Throwable>() {
-                    @Override
-                    public void accept(Throwable throwable) {
-                        Log.d("fail","fail");
-                    }
-                });
-    }
-
     @Override
     protected void onPause() {
         super.onPause();

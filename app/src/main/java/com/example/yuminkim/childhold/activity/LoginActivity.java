@@ -14,7 +14,10 @@ import android.widget.ListPopupWindow;
 
 import com.example.yuminkim.childhold.R;
 import com.example.yuminkim.childhold.network.ApiService;
+import com.example.yuminkim.childhold.network.model.BaseResponse;
 import com.example.yuminkim.childhold.network.model.LoginResponse;
+import com.onesignal.OSPermissionSubscriptionState;
+import com.onesignal.OneSignal;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -28,6 +31,7 @@ public class LoginActivity extends Activity {
     private String[] USER_TYPES_TEXT = {"운전자", "보호자"};
     private String userType;
     private Disposable disposable;
+    private Disposable loginDisposable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +87,7 @@ public class LoginActivity extends Activity {
         popupWindow.show();
     }
 
+    //FIXME: auto-login 체크해서 자동로그인 시키도록 변경(시연때는 필요할려나?)
     private void doLogin() {
         String code = passwordEditText.getText().toString();
         disposable = ApiService.getCOMMON_SERVICE().login(userType, code)
@@ -91,16 +96,7 @@ public class LoginActivity extends Activity {
                 .subscribe(new Consumer<LoginResponse>() {
                     @Override
                     public void accept(LoginResponse loginResponse) {
-                        //TODO: idx를 파라메터로 넘겨주자
-                        if (userType == "parent") {
-                            Intent intent = new Intent(LoginActivity.this, ParentActivity.class);
-                            startActivity(intent);
-                            finish();
-                        } else {
-                            Intent intent = new Intent(LoginActivity.this, DriverActivity.class);
-                            startActivity(intent);
-                            finish();
-                        }
+                        updateDeviceId(loginResponse.idx);
                      }
                 }, new Consumer<Throwable>() {
                     @Override
@@ -110,11 +106,51 @@ public class LoginActivity extends Activity {
                 });
     }
 
+    private void updateDeviceId(String idx) {
+        OSPermissionSubscriptionState status = OneSignal.getPermissionSubscriptionState();
+        String userId = status.getSubscriptionStatus().getUserId();
+        if (userId != null) {
+            loginDisposable = ApiService.getCOMMON_SERVICE().updateUserDeviceId(userType, idx, userId)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Consumer<BaseResponse>() {
+                        @Override
+                        public void accept(BaseResponse baseResponse) {
+                            Log.d("status", "status : " + baseResponse.status);
+                            nextStep();
+                        }
+                    }, new Consumer<Throwable>() {
+                        @Override
+                        public void accept(Throwable throwable) {
+                            Log.d("fail", "fail");
+                        }
+                    });
+        } else {
+            nextStep();
+        }
+    }
+
+    private void nextStep() {
+        if (userType == "parent") {
+            Intent intent = new Intent(LoginActivity.this, ParentActivity.class);
+            startActivity(intent);
+            finish();
+        } else {
+            Intent intent = new Intent(LoginActivity.this, DriverActivity.class);
+            startActivity(intent);
+            finish();
+        }
+    }
+
     @Override
     protected void onPause() {
         super.onPause();
         if (disposable != null) {
             disposable.dispose();
+        }
+
+        if (loginDisposable != null) {
+            loginDisposable.dispose();
         }
     }
 }
