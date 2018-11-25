@@ -23,6 +23,7 @@ import com.example.yuminkim.childhold.model.LatLng;
 import com.example.yuminkim.childhold.network.ApiService;
 
 import com.example.yuminkim.childhold.sensor.CHBluetoothManager;
+import com.example.yuminkim.childhold.util.PushMessageUtil;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -81,9 +82,9 @@ public class DriverActivity extends Activity implements OnMapReadyCallback {
                         map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16));
                     }
                 });
+                startBeaconScan();
             }
         });
-        startBeaconScan();
     }
 
     //TODO: Check Bluetooth is ON?
@@ -91,21 +92,30 @@ public class DriverActivity extends Activity implements OnMapReadyCallback {
         CHBluetoothManager.getInstance(this).scanLeDevice(true, new ScanCallback() {
             @Override
             public void onScanResult(int callbackType, ScanResult result) {
-                Log.i("callbackType", String.valueOf(callbackType));
-                Log.i("result", result.getDevice().getAddress());
-            }
-
-            @Override
-            public void onBatchScanResults(List<ScanResult> results) {
-                for (ScanResult sr : results) {
-                    Log.i("ScanResult - Results", sr.toString());
+                if (!childArrayList.isEmpty()) {
+                    String curDeviceId = result.getDevice().getAddress();
+                    if (curDeviceId != null) {
+                        Child curChild = null;
+                        for (Child child : childArrayList) {
+                            if (child.getBeaconId().equals(curDeviceId)) {
+                                curChild = child;
+                                break;
+                            }
+                        }
+                        if (curChild != null) {
+                            PushMessageUtil.sendPushNotification(curChild.getDeviceId(), curChild.getName(), true);
+                            childArrayList.remove(curChild);
+                            childListAdapter.notifyDataSetChanged();
+                        }
+                    }
                 }
             }
 
             @Override
-            public void onScanFailed(int errorCode) {
-                Log.e("Scan Failed", "Error Code: " + errorCode);
-            }
+            public void onBatchScanResults(List<ScanResult> results) { }
+
+            @Override
+            public void onScanFailed(int errorCode) { }
         });
     }
 
