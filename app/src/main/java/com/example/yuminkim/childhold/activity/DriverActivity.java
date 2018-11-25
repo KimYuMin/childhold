@@ -2,6 +2,8 @@ package com.example.yuminkim.childhold.activity;
 
 import android.Manifest;
 import android.app.Activity;
+import android.bluetooth.le.ScanCallback;
+import android.bluetooth.le.ScanResult;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -20,20 +22,16 @@ import com.example.yuminkim.childhold.model.ChildListAdapter;
 import com.example.yuminkim.childhold.model.LatLng;
 import com.example.yuminkim.childhold.network.ApiService;
 
-import com.example.yuminkim.childhold.network.model.BaseResponse;
+import com.example.yuminkim.childhold.sensor.CHBluetoothManager;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.onesignal.OSPermissionSubscriptionState;
-import com.onesignal.OneSignal;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
@@ -51,8 +49,6 @@ public class DriverActivity extends Activity implements OnMapReadyCallback {
 
     private Disposable disposable;
     private Disposable disposable2;
-    private Disposable disposable3;
-
     private com.google.android.gms.maps.model.LatLng center;
 
     @Override
@@ -87,8 +83,31 @@ public class DriverActivity extends Activity implements OnMapReadyCallback {
                 });
             }
         });
+        startBeaconScan();
     }
 
+    //TODO: Check Bluetooth is ON?
+    private void startBeaconScan() {
+        CHBluetoothManager.getInstance(this).scanLeDevice(true, new ScanCallback() {
+            @Override
+            public void onScanResult(int callbackType, ScanResult result) {
+                Log.i("callbackType", String.valueOf(callbackType));
+                Log.i("result", result.getDevice().getAddress());
+            }
+
+            @Override
+            public void onBatchScanResults(List<ScanResult> results) {
+                for (ScanResult sr : results) {
+                    Log.i("ScanResult - Results", sr.toString());
+                }
+            }
+
+            @Override
+            public void onScanFailed(int errorCode) {
+                Log.e("Scan Failed", "Error Code: " + errorCode);
+            }
+        });
+    }
 
     private static String[] permission_map = {
             Manifest.permission.ACCESS_FINE_LOCATION,
