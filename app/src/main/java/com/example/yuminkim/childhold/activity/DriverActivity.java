@@ -104,6 +104,7 @@ public class DriverActivity extends Activity implements OnMapReadyCallback {
                         }
                         if (curChild != null) {
                             PushMessageUtil.sendPushNotification(curChild.getDeviceId(), curChild.getName(), true);
+                            //FIXME: 왜 유민이가 탔는데 세훈이가 사라질까 ㅅㅂ라멎댈ㅈㄷ
                             childArrayList.remove(curChild);
                             childListAdapter.notifyDataSetChanged();
                         }
