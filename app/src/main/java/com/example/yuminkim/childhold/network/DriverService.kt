@@ -9,8 +9,4 @@ import retrofit2.http.*
 interface DriverService {
     @GET("child_list.php")
     fun getChildList(@Query("driver_id") driverId: Int): Observable<ArrayList<Child>>
-
-    @GET("drive_route.php")
-    fun getDriveRoute(@Query("driver_id") driverId: Int): Observable<ArrayList<LatLng>>
-
 }
