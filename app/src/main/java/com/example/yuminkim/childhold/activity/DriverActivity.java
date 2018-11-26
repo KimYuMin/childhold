@@ -224,7 +224,11 @@ public class DriverActivity extends Activity implements OnMapReadyCallback {
                         new CHBluetoothManager.DriveEndScanCallback() {
             @Override
             public void driveEnd(boolean status) {
-                if (status)  {
+                if (status) {
+                    //모든 탑승한 아이의 부모에게 안전하차 push알림 보내기
+                    for (Child c : childListForEndDrive) {
+                        PushMessageUtil.sendPushNotificationForSafetyEnd(c.getDeviceId());
+                    }
                     //TODO: 아이가 모두 내렸음 끝 !
                 } else {
                     //TODO: 아이가 아직 남아있음 다시 스캔을 돌리도록 유도 !
