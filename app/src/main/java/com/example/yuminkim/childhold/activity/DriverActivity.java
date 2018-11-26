@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -47,7 +46,7 @@ public class DriverActivity extends Activity implements OnMapReadyCallback {
     ListView childlist_view;
     ChildListAdapter childListAdapter;
     ArrayList<Child> childArrayList;
-
+    ArrayList<Child> childListForEndDrive;
     private Disposable disposable;
     private Disposable disposable2;
     private com.google.android.gms.maps.model.LatLng center;
@@ -57,6 +56,7 @@ public class DriverActivity extends Activity implements OnMapReadyCallback {
         super.onCreate(savedInstanceState);
 
         childArrayList = new ArrayList<>();
+        childListForEndDrive = new ArrayList<>();
         setContentView(R.layout.activity_driver);
         initMap();
 
@@ -189,6 +189,7 @@ public class DriverActivity extends Activity implements OnMapReadyCallback {
                             lat += c.getLatLng().getLat();
                             lng += c.getLatLng().getLng();
                             childArrayList.add(c);
+                            childListForEndDrive.add(c);
                             map.addMarker( new MarkerOptions().position(
                                     new com.google.android.gms.maps.model.LatLng(
                                             c.getLatLng().getLat(),
@@ -215,6 +216,21 @@ public class DriverActivity extends Activity implements OnMapReadyCallback {
 
     private void postMapProcess(){
         map.animateCamera(CameraUpdateFactory.newLatLngZoom(center, 14));
+    }
+
+    private void driveEnd() {
+        CHBluetoothManager.getInstance(this)
+                .driveEndScan(childListForEndDrive,
+                        new CHBluetoothManager.DriveEndScanCallback() {
+            @Override
+            public void driveEnd(boolean status) {
+                if (status)  {
+                    //TODO: 아이가 모두 내렸음 끝 !
+                } else {
+                    //TODO: 아이가 아직 남아있음 다시 스캔을 돌리도록 유도 !
+                }
+            }
+        });
     }
 
     @Override
