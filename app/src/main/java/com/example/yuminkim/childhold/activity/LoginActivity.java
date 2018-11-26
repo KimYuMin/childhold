@@ -16,6 +16,7 @@ import com.example.yuminkim.childhold.R;
 import com.example.yuminkim.childhold.network.ApiService;
 import com.example.yuminkim.childhold.network.model.BaseResponse;
 import com.example.yuminkim.childhold.network.model.LoginResponse;
+import com.example.yuminkim.childhold.util.Constants;
 import com.onesignal.OSPermissionSubscriptionState;
 import com.onesignal.OneSignal;
 
@@ -106,7 +107,7 @@ public class LoginActivity extends Activity {
                 });
     }
 
-    private void updateDeviceId(String idx) {
+    private void updateDeviceId(final String idx) {
         OSPermissionSubscriptionState status = OneSignal.getPermissionSubscriptionState();
         String userId = status.getSubscriptionStatus().getUserId();
         if (userId != null) {
@@ -117,7 +118,7 @@ public class LoginActivity extends Activity {
                         @Override
                         public void accept(BaseResponse baseResponse) {
                             Log.d("status", "status : " + baseResponse.status);
-                            nextStep();
+                            nextStep(idx);
                         }
                     }, new Consumer<Throwable>() {
                         @Override
@@ -126,17 +127,19 @@ public class LoginActivity extends Activity {
                         }
                     });
         } else {
-            nextStep();
+            nextStep(idx);
         }
     }
 
-    private void nextStep() {
+    private void nextStep(String idx) {
         if (userType == "parent") {
             Intent intent = new Intent(LoginActivity.this, ParentActivity.class);
+            intent.putExtra(Constants.KEY_IDX, idx);
             startActivity(intent);
             finish();
         } else {
             Intent intent = new Intent(LoginActivity.this, DriverActivity.class);
+            intent.putExtra(Constants.KEY_IDX, idx);
             startActivity(intent);
             finish();
         }

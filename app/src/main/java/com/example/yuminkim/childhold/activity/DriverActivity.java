@@ -22,6 +22,7 @@ import com.example.yuminkim.childhold.model.LatLng;
 import com.example.yuminkim.childhold.network.ApiService;
 
 import com.example.yuminkim.childhold.sensor.CHBluetoothManager;
+import com.example.yuminkim.childhold.util.Constants;
 import com.example.yuminkim.childhold.util.PushMessageUtil;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -50,11 +51,13 @@ public class DriverActivity extends Activity implements OnMapReadyCallback {
     private Disposable disposable;
     private Disposable disposable2;
     private com.google.android.gms.maps.model.LatLng center;
+    String idx;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        idx = getIntent().getStringExtra(Constants.KEY_IDX);
         childArrayList = new ArrayList<>();
         childListForEndDrive = new ArrayList<>();
         setContentView(R.layout.activity_driver);
@@ -173,7 +176,7 @@ public class DriverActivity extends Activity implements OnMapReadyCallback {
         UiSettings uiSettings = map.getUiSettings();
         uiSettings.setZoomControlsEnabled(true);
         // child list 를 부르고 아이의 위치를 가져와야 맵을 줌하고 마커를 그릴 수 있음
-        getChildList(1);
+        getChildList(Integer.parseInt(idx));
     }
 
 
@@ -226,9 +229,15 @@ public class DriverActivity extends Activity implements OnMapReadyCallback {
             public void driveEnd(boolean status) {
                 if (status) {
                     //모든 탑승한 아이의 부모에게 안전하차 push알림 보내기
+                    String ids = "";
                     for (Child c : childListForEndDrive) {
-                        PushMessageUtil.sendPushNotificationForSafetyEnd(c.getDeviceId());
+                        if (ids.equals("")) {
+                            ids += c.getDeviceId();
+                        } else {
+                            ids += ", " + c.getDeviceId();
+                        }
                     }
+                    PushMessageUtil.sendPushNotificationForSafetyEnd(ids);
                     //TODO: 아이가 모두 내렸음 끝 !
                 } else {
                     //TODO: 아이가 아직 남아있음 다시 스캔을 돌리도록 유도 !

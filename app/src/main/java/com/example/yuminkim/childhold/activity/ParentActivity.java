@@ -15,7 +15,10 @@ import android.widget.Toast;
 import com.example.yuminkim.childhold.R;
 import com.example.yuminkim.childhold.model.LatLng;
 import com.example.yuminkim.childhold.network.ApiService;
+import com.example.yuminkim.childhold.network.model.AbsentResponse;
 import com.example.yuminkim.childhold.network.model.BaseResponse;
+import com.example.yuminkim.childhold.util.Constants;
+import com.example.yuminkim.childhold.util.PushMessageUtil;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -41,12 +44,13 @@ public class ParentActivity extends Activity implements OnMapReadyCallback {
     Disposable disposable;
     Disposable disposable2;
     LatLng driver_location;
+    String idx;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_parent);
-
+        idx = getIntent().getStringExtra(Constants.KEY_IDX);
         parent_locaion_btn = findViewById(R.id.parent_location_btn);
         parent_absent_btn = findViewById(R.id.parent_absent_btn);
         initMap();
@@ -79,13 +83,13 @@ public class ParentActivity extends Activity implements OnMapReadyCallback {
         parent_absent_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                disposable2 = ApiService.getPARENT_SERVICE().updateChildAbsent(1, 1)
+                disposable2 = ApiService.getPARENT_SERVICE().updateChildAbsent(Integer.parseInt(idx), 1)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new Consumer<BaseResponse>() {
+                        .subscribe(new Consumer<AbsentResponse>() {
                             @Override
-                            public void accept(BaseResponse baseResponse) {
-                                Toast.makeText(ParentActivity.this, baseResponse.status, Toast.LENGTH_SHORT).show();
+                            public void accept(AbsentResponse absentResponse) {
+                                PushMessageUtil.sendAbsentPushNotification(absentResponse.driverId, idx);
                             }
                         });
 

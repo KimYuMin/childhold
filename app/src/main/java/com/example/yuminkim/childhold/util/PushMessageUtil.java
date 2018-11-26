@@ -8,7 +8,6 @@ import org.json.JSONObject;
 
 public class PushMessageUtil {
     public static void sendPushNotification(String userId, String childName, boolean isRide) {
-        //FIXME: Push from me modify send to other
         OSPermissionSubscriptionState status = OneSignal.getPermissionSubscriptionState();
         boolean isSubscribed = status.getSubscriptionStatus().getSubscribed();
 
@@ -30,8 +29,7 @@ public class PushMessageUtil {
         }
     }
 
-    public static void sendPushNotificationForSafetyEnd(String userId) {
-        //FIXME: Push from me modify send to other
+    public static void sendPushNotificationForSafetyEnd(String userIds) {
         OSPermissionSubscriptionState status = OneSignal.getPermissionSubscriptionState();
         boolean isSubscribed = status.getSubscriptionStatus().getSubscribed();
 
@@ -42,10 +40,30 @@ public class PushMessageUtil {
             JSONObject notificationContent = new JSONObject(
                     "{'contents': " +
                             "{'en': '아이들이 모두 안전하게 하차하였습니다.'}," +
-                            "'include_player_ids': ['" + userId + "'], " +
+                            "'include_player_ids': ['" + userIds + "'], " +
                             "'headings': {'en': '승하차알림'}" +
                             "} ");
-            //"'big_picture': 'http://i.imgur.com/DKw1J2F.gif'}"
+            OneSignal.postNotification(notificationContent, null);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void sendAbsentPushNotification(String driverId, String childId) {
+        OSPermissionSubscriptionState status = OneSignal.getPermissionSubscriptionState();
+        boolean isSubscribed = status.getSubscriptionStatus().getSubscribed();
+
+        if (!isSubscribed)
+            return;
+
+        try {
+            JSONObject notificationContent = new JSONObject(
+                    "{'contents': " +
+                            "{'en': '탑승하지 않을 예정입니다. 운행에 참고바랍니다.'}," +
+                            "'include_player_ids': ['" + driverId + "'], " +
+                            "'headings': {'en': '승하차알림'}" +
+                            "'data': { 'id': '" + childId + "' }" +
+                            "} ");
             OneSignal.postNotification(notificationContent, null);
         } catch (JSONException e) {
             e.printStackTrace();
