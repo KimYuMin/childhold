@@ -49,7 +49,6 @@
             android:padding="8dp"
             android:layout_marginLeft="35dp"
             android:layout_marginRight="35dp"
-            android:background="@android:color/white"
             android:hint="회원 종류를 선택해주세요"
             android:inputType="none"/>
 
@@ -64,7 +63,6 @@
             android:padding="8dp"
             android:layout_marginLeft="35dp"
             android:layout_marginRight="35dp"
-            android:background="@android:color/white"
             android:maxLength="4"
             android:hint="발급 받으신 코드 네자리를 입력해주세요"
             android:inputType="numberPassword"/>

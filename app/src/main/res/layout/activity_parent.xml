@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -24,13 +23,15 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="2"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:visibility="gone">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="50dp"
             android:orientation="horizontal"
             android:layout_marginTop="70dp"
             android:weightSum="5">
+
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -89,32 +90,72 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="match_parent"
         android:layout_weight="2"
-        android:orientation="vertical"
-        android:layout_marginTop="50dp">
+        android:orientation="vertical">
 
-        <Button
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:layout_marginLeft="30dp"
-            android:layout_marginRight="30dp"
-            android:background="#ff944d"
-            android:text="아이 위치 보기"
-            android:textSize="20dp"
-            android:textColor="#ffffff"
-            android:id="@+id/parent_location_btn"/>
-        <Button
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="#ff944d">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="72dp"
+                    android:src="@drawable/icon_map"/>
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:background="#ff944d"
+                    android:text="아이 위치 보기"
+                    android:textSize="20dp"
+                    android:textColor="#ffffff"
+                    android:id="@+id/parent_location_btn"/>
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="60dp"
-            android:layout_marginTop="40dp"
-            android:layout_marginLeft="30dp"
-            android:layout_marginRight="30dp"
-            android:background="#ff944d"
-            android:textColor="#ffffff"
-            android:text="아이 위치 변경"
-            android:textSize="20dp"
-            android:id="@+id/parent_absent_btn"/>
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="#ffffff">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:orientation="vertical">
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="72dp"
+                    android:src="@drawable/icon_edit"/>
+
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:background="#ffffff"
+                    android:textColor="#ff944d"
+                    android:text="아이 상태 변경"
+                    android:textSize="20dp"
+                    android:id="@+id/parent_absent_btn"/>
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
     </LinearLayout>
 
 </LinearLayout>
