@@ -6,34 +6,114 @@
     android:layout_height="match_parent"
     tools:context=".activity.ParentActivity"
     android:orientation="vertical"
+    android:background="@drawable/background"
     android:weightSum="5">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="3">
+        android:layout_weight="3"
+        android:visibility="gone">
         <fragment
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/parent_map"
             android:name="com.google.android.gms.maps.MapFragment"/>
     </LinearLayout>
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="2"
         android:orientation="vertical">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:orientation="horizontal"
+            android:layout_marginTop="70dp"
+            android:weightSum="5">
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="25dp"
+                android:layout_weight="2"
+                android:text="김유민"
+                android:paddingTop="4dp"
+                android:textAlignment="center"
+                android:textSize="30sp"/>
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:textSize="23sp"
+                android:layout_marginLeft="17dp"
+                android:text="어머님 안녕하세요"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:orientation="horizontal"
+            android:layout_marginTop="10dp"
+            android:weightSum="6"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="15dp">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="오늘은"
+                android:padding="5dp"
+                android:textAlignment="center"
+                android:textSize="23sp"
+                android:layout_weight="1.5"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="금요일"
+                android:paddingTop="4dp"
+                android:textAlignment="center"
+                android:textSize="26sp"
+                android:layout_weight="2"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="등원 날입니다."
+                android:paddingLeft="13dp"
+                android:textSize="23sp"
+                android:layout_weight="3"/>
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        android:orientation="vertical"
+        android:layout_marginTop="50dp">
 
         <Button
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="위치보기"
+            android:layout_height="60dp"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            android:background="#ff944d"
+            android:text="아이 위치 보기"
+            android:textSize="20dp"
+            android:textColor="#ffffff"
             android:id="@+id/parent_location_btn"/>
         <Button
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="아이안감"
+            android:layout_height="60dp"
+            android:layout_marginTop="40dp"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            android:background="#ff944d"
+            android:textColor="#ffffff"
+            android:text="아이 위치 변경"
+            android:textSize="20dp"
             android:id="@+id/parent_absent_btn"/>
     </LinearLayout>
 

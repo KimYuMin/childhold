@@ -31,6 +31,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,6 +49,7 @@ public class DriverActivity extends Activity implements OnMapReadyCallback {
     ChildListAdapter childListAdapter;
     ArrayList<Child> childArrayList;
     ArrayList<Child> childListForEndDrive;
+    ArrayList<Child> childListForExit;
     private Disposable disposable;
     private Disposable disposable2;
     private com.google.android.gms.maps.model.LatLng center;
@@ -60,6 +62,7 @@ public class DriverActivity extends Activity implements OnMapReadyCallback {
         idx = getIntent().getStringExtra(Constants.KEY_IDX);
         childArrayList = new ArrayList<>();
         childListForEndDrive = new ArrayList<>();
+        childListForExit = new ArrayList<>();
         setContentView(R.layout.activity_driver);
         initMap();
 
@@ -91,7 +94,7 @@ public class DriverActivity extends Activity implements OnMapReadyCallback {
     }
 
     //TODO: Check Bluetooth is ON?
-    private void startBeaconScan() {
+    private void startBeaconScan() { // 여기가 비콘스캔인데...
         CHBluetoothManager.getInstance(this).scanLeDevice(true, new ScanCallback() {
             @Override
             public void onScanResult(int callbackType, ScanResult result) {
@@ -122,6 +125,38 @@ public class DriverActivity extends Activity implements OnMapReadyCallback {
             public void onScanFailed(int errorCode) { }
         });
     }
+
+    //TODO: Check Bluetooth is ON?
+    private void BeaconScanForHome() { // 여기가 비콘스캔인데...
+        final ArrayList<Child> childListForExit_copy = new ArrayList<>(childListForExit);
+        CHBluetoothManager.getInstance(this).scanLeDeviceForExit(true, new ScanCallback() {
+            @Override
+            public void onScanResult(int callbackType, ScanResult result) {
+                String curDeviceId = result.getDevice().getAddress();
+                if (curDeviceId != null) {
+                    for (Child child : childListForExit) {
+                        if (child.getBeaconId().equals(curDeviceId)) {
+                            childListForExit_copy.remove(child);
+                        }
+                    }
+                }
+            }
+        }, new CHBluetoothManager.DriveEndScanCallback() {
+            @Override
+            public void driveEnd(boolean status) {
+                // nothing
+            }
+
+            @Override
+            public void scanEnd() {
+                for(Child child : childListForExit_copy){
+                  PushMessageUtil.sendPushNotification(child.getDeviceId(), child.getName(), false);
+                }
+            }
+        });
+
+    }
+
 
     private static String[] permission_map = {
             Manifest.permission.ACCESS_FINE_LOCATION,
@@ -193,6 +228,7 @@ public class DriverActivity extends Activity implements OnMapReadyCallback {
                             lng += c.getLatLng().getLng();
                             childArrayList.add(c);
                             childListForEndDrive.add(c);
+                            childListForExit.add(c);
                             map.addMarker( new MarkerOptions().position(
                                     new com.google.android.gms.maps.model.LatLng(
                                             c.getLatLng().getLat(),
@@ -242,6 +278,11 @@ public class DriverActivity extends Activity implements OnMapReadyCallback {
                 } else {
                     //TODO: 아이가 아직 남아있음 다시 스캔을 돌리도록 유도 !
                 }
+            }
+
+            @Override
+            public void scanEnd() {
+
             }
         });
     }

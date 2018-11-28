@@ -20,6 +20,7 @@ import java.util.List;
 public class CHBluetoothManager {
     public interface DriveEndScanCallback {
         void driveEnd(boolean status);
+        void scanEnd();
     }
 
     //TODO: scan period make infinite
@@ -72,6 +73,22 @@ public class CHBluetoothManager {
                 @Override
                 public void run() {
                     leScanner.stopScan(scanCallback);
+                }
+            }, SCAN_PERIOD);
+
+            leScanner.startScan(filters, settings, scanCallback);
+        } else {
+            leScanner.stopScan(scanCallback);
+        }
+    }
+
+    public void scanLeDeviceForExit(final boolean enable, final ScanCallback scanCallback, final DriveEndScanCallback stopScanCallback) {
+        if (enable) {
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    leScanner.stopScan(scanCallback);
+                    stopScanCallback.scanEnd();
                 }
             }, SCAN_PERIOD);
 
