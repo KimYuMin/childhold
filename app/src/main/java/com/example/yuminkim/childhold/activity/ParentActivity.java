@@ -91,17 +91,7 @@ public class ParentActivity extends Activity implements OnMapReadyCallback {
         parent_absent_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                disposable2 = ApiService.getPARENT_SERVICE().updateChildAbsent(Integer.parseInt(idx), 1)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new Consumer<AbsentResponse>() {
-                            @Override
-                            public void accept(AbsentResponse absentResponse) {
-                                PushMessageUtil.sendAbsentPushNotification(absentResponse.driverId, idx);
-                                isAbsent = !isAbsent;
-                                callAbsentDialog();
-                            }
-                        });
+                callAbsentDialog();
             }
         });
     }
@@ -113,7 +103,17 @@ public class ParentActivity extends Activity implements OnMapReadyCallback {
                 .setPositiveButton("확인", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
+                        isAbsent = !isAbsent;
                         layout_cover_absent.setVisibility(isAbsent ? View.VISIBLE : View.GONE);
+                        disposable2 = ApiService.getPARENT_SERVICE().updateChildAbsent(Integer.parseInt(idx), isAbsent ? 1 : 0)
+                                .subscribeOn(Schedulers.io())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(new Consumer<AbsentResponse>() {
+                                    @Override
+                                    public void accept(AbsentResponse absentResponse) {
+                                        PushMessageUtil.sendAbsentPushNotification(absentResponse.driverId, idx);
+                                    }
+                                });
                         dialogInterface.dismiss();
                     }
                 }).setNegativeButton("취소", new DialogInterface.OnClickListener() {
