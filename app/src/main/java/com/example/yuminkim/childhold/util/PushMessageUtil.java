@@ -61,7 +61,7 @@ public class PushMessageUtil {
                     "{'contents': " +
                             "{'en': '탑승하지 않을 예정입니다. 운행에 참고바랍니다.'}," +
                             "'include_player_ids': ['" + driverId + "'], " +
-                            "'headings': {'en': '승하차알림'}" +
+                            "'headings': {'en': '승하차알림'}," +
                             "'data': { 'id': '" + childId + "' }" +
                             "} ");
             OneSignal.postNotification(notificationContent, null);
