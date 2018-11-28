@@ -2,6 +2,8 @@ package com.example.yuminkim.childhold.activity;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -10,6 +12,8 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.example.yuminkim.childhold.R;
@@ -39,12 +43,14 @@ public class ParentActivity extends Activity implements OnMapReadyCallback {
     double myLat;
     double myLng;
 
-    Button parent_locaion_btn, parent_absent_btn;
+    RelativeLayout parent_locaion_btn, parent_absent_btn;
     private com.google.android.gms.maps.model.LatLng center;
     Disposable disposable;
     Disposable disposable2;
     LatLng driver_location;
     String idx;
+    boolean isAbsent = false;
+    View layout_cover_absent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,10 +59,12 @@ public class ParentActivity extends Activity implements OnMapReadyCallback {
         idx = getIntent().getStringExtra(Constants.KEY_IDX);
         parent_locaion_btn = findViewById(R.id.parent_location_btn);
         parent_absent_btn = findViewById(R.id.parent_absent_btn);
+        layout_cover_absent = findViewById(R.id.layout_cover_absent);
         initMap();
         parent_locaion_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (isAbsent) return;
                 disposable = ApiService.getPARENT_SERVICE().getDriverLocation(1)
                         .subscribeOn(Schedulers.io())
                         .observeOn(AndroidSchedulers.mainThread())
@@ -90,11 +98,31 @@ public class ParentActivity extends Activity implements OnMapReadyCallback {
                             @Override
                             public void accept(AbsentResponse absentResponse) {
                                 PushMessageUtil.sendAbsentPushNotification(absentResponse.driverId, idx);
+                                isAbsent = !isAbsent;
+                                callAbsentDialog();
                             }
                         });
-
             }
         });
+    }
+
+    private void callAbsentDialog() {
+        final AlertDialog alertDialog = new AlertDialog.Builder(ParentActivity.this)
+                .setTitle("부재 알림")
+                .setMessage("아이의 상태를 (" + (isAbsent ? "승차하지않음" : "승차함") + ") 으로 변경하시겠습니까?")
+                .setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        layout_cover_absent.setVisibility(isAbsent ? View.VISIBLE : View.GONE);
+                        dialogInterface.dismiss();
+                    }
+                }).setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                }).create();
+        alertDialog.show();
     }
 
     private static String[] permission_map = {
