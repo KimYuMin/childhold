@@ -13,6 +13,18 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
+
+import com.example.yuminkim.childhold.model.Child;
+import com.example.yuminkim.childhold.network.ApiService;
+import com.example.yuminkim.childhold.network.model.BaseResponse;
+
+import java.util.ArrayList;
+
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
 
 
 public class LocationTracker extends Service implements LocationListener {
@@ -25,15 +37,18 @@ public class LocationTracker extends Service implements LocationListener {
 
     Location location;
     double lat, lng;
+    String driver_id;
 
     private static final float MIN_DISTANCE_CHANGE_FOR_UPDATES = 10f;
     private static final long MIN_TIME_BW_UPDATES = 1000 * 10;
 
     protected LocationManager locationManager;
+    private Disposable disposable;
 
-    public LocationTracker(Context context, Handler handler){
+    public LocationTracker(Context context, Handler handler, String driver_id){
         this.mContext = context;
         this.mHandler = handler;
+        this.driver_id = driver_id;
         getLocation();
     }
     public void Update(){
@@ -90,7 +105,17 @@ public class LocationTracker extends Service implements LocationListener {
         if(location != null){
             double lat = location.getLatitude();
             double lng = location.getLongitude();
-            // 서버로넘기기 
+            Log.d("location change" + lat + " " + lng , "");
+            // 서버로넘기기
+            disposable = ApiService.getDRIVER_SERVICE().updateDriverLocation(Integer.parseInt(driver_id), lat, lng)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(new Consumer<BaseResponse>() {
+                        @Override
+                        public void accept(BaseResponse baseResponse) {
+
+                        }
+                    });
         }
     }
     @Override

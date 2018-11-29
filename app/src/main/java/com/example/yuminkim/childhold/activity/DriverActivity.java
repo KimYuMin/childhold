@@ -88,7 +88,7 @@ public class DriverActivity extends BaseActivity{
                     }
                 });
                 startBeaconScan();
-                locationTracker = new LocationTracker(DriverActivity.this, mHandler);
+                locationTracker = new LocationTracker(DriverActivity.this, mHandler, idx);
                 double lat = locationTracker.getLat();
                 double lng = locationTracker.getLng();
                 Toast.makeText(getApplicationContext(), "LOCATION : " + lat + " " + lng, Toast.LENGTH_SHORT).show();
