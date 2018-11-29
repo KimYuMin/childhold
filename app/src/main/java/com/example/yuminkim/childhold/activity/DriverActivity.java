@@ -21,7 +21,6 @@ import com.example.yuminkim.childhold.R;
 import com.example.yuminkim.childhold.model.Child;
 import com.example.yuminkim.childhold.model.ChildListAdapter;
 import com.example.yuminkim.childhold.model.LatLng;
-import com.example.yuminkim.childhold.model.NotificationData;
 import com.example.yuminkim.childhold.network.ApiService;
 
 import com.example.yuminkim.childhold.sensor.CHBluetoothManager;
@@ -42,7 +41,8 @@ import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
 public class DriverActivity extends BaseActivity{
-    private Button drive_start_btn;
+    private Button driveForGoToSchool;
+    private Button driveForGoToHome;
     private ListView childlist_view;
     private ChildListAdapter childListAdapter;
     private ArrayList<Child> childArrayList;
@@ -64,8 +64,10 @@ public class DriverActivity extends BaseActivity{
         childListForExit = new ArrayList<>();
 
         mHandler = new Handler();
-        drive_start_btn = findViewById(R.id.drive_start_btn);
-        drive_start_btn.setOnClickListener(new View.OnClickListener() {
+        driveForGoToSchool = findViewById(R.id.drive_go_to_school_btn);
+        driveForGoToHome = findViewById(R.id.drive_go_to_home_btn);
+        driveForGoToSchool.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View view) {
                 LinearLayout driver_default_linear = findViewById(R.id.driver_default);
@@ -92,6 +94,12 @@ public class DriverActivity extends BaseActivity{
                 Toast.makeText(getApplicationContext(), "LOCATION : " + lat + " " + lng, Toast.LENGTH_SHORT).show();
             }
         });
+        driveForGoToHome.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
     }
 
     @Override
@@ -114,16 +122,10 @@ public class DriverActivity extends BaseActivity{
         public void onReceive(Context context, Intent intent) {
             String title = intent.getStringExtra("title");
             String alert = intent.getStringExtra("alert");
-            NotificationData data = new NotificationData(intent.getStringExtra("custom"));
-            try {
-                String parentId = data.toJsonObject().getJSONObject("a").getString("id");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
             AlertUtil.showAlert(DriverActivity.this, title, alert, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
+                    getChildList(Integer.parseInt(idx));
                     dialog.dismiss();
                 }
             }, new DialogInterface.OnClickListener() {
@@ -153,7 +155,6 @@ public class DriverActivity extends BaseActivity{
                         }
                         if (curChild != null) {
                             PushMessageUtil.sendPushNotification(curChild.getDeviceId(), curChild.getName(), true);
-                            //FIXME: 왜 유민이가 탔는데 세훈이가 사라질까 ㅅㅂ라멎댈ㅈㄷ
                             childArrayList.remove(curChild);
                             childListAdapter.notifyDataSetChanged();
                         }
@@ -212,7 +213,11 @@ public class DriverActivity extends BaseActivity{
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<ArrayList<Child>>() {
                     @Override
-                    public void accept(ArrayList<Child> children) throws Exception {
+                    public void accept(ArrayList<Child> children) {
+                        childArrayList.clear();
+                        childListForEndDrive.clear();
+                        childListForExit.clear();
+                        map.clear();
                         double lat = 0, lng = 0;
                         for (Child c: children) {
                             lat += c.getLatLng().getLat();
@@ -235,10 +240,11 @@ public class DriverActivity extends BaseActivity{
                         if (map != null) {
                             postMapProcess();
                         }
+                        childListAdapter.notifyDataSetChanged();
                     }
                 }, new Consumer<Throwable>() {
                     @Override
-                    public void accept(Throwable throwable) throws Exception {
+                    public void accept(Throwable throwable) {
                         //TODO: handle error
                     }
                 });

@@ -47,21 +47,21 @@ public class ChildListAdapter extends BaseAdapter {
 
         if(view == null){
             view = LayoutInflater.from(context).inflate(R.layout.child_list, null);
-            child_location = view.findViewById(R.id.child_location);
-            child_name = view.findViewById(R.id.child_name);
-            index = view.findViewById(R.id.text_index);
-            Geocoder geocoder = new Geocoder(context);
-            try {
-                Address address = geocoder.getFromLocation(childArrayList.get(i).getLatLng().getLat(), childArrayList.get(i).getLatLng().getLng(), 1).get(0);
-
-                location = address.getLocality() + " " + address.getThoroughfare() + " " +  address.getFeatureName().trim() ;
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            index.setText(String.format("%d", i + 1));
-            child_location.setText(location);
-            child_name.setText(childArrayList.get(i).getName());
         }
+        child_location = view.findViewById(R.id.child_location);
+        child_name = view.findViewById(R.id.child_name);
+        index = view.findViewById(R.id.text_index);
+        Geocoder geocoder = new Geocoder(context);
+        try {
+            Address address = geocoder.getFromLocation(childArrayList.get(i).getLatLng().getLat(), childArrayList.get(i).getLatLng().getLng(), 1).get(0);
+
+            location = address.getLocality() + " " + address.getThoroughfare() + " " +  address.getFeatureName().trim() ;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        index.setText(String.format("%d", i + 1));
+        child_location.setText(location);
+        child_name.setText(childArrayList.get(i).getName());
         return view;
     }
 }
