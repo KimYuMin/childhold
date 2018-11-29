@@ -1,7 +1,5 @@
 package com.example.yuminkim.childhold.activity;
 
-import android.Manifest;
-import android.app.Activity;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
 import android.os.Bundle;
