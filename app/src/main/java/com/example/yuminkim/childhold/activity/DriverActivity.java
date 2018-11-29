@@ -9,7 +9,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -39,7 +38,8 @@ import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
 public class DriverActivity extends BaseActivity{
-    private Button drive_start_btn;
+    private Button driveForGoToSchool;
+    private Button driveForGoToHome;
     private ListView childlist_view;
     private ChildListAdapter childListAdapter;
     private ArrayList<Child> childArrayList;
@@ -58,8 +58,9 @@ public class DriverActivity extends BaseActivity{
         childListForEndDrive = new ArrayList<>();
         childListForExit = new ArrayList<>();
 
-        drive_start_btn = findViewById(R.id.drive_start_btn);
-        drive_start_btn.setOnClickListener(new View.OnClickListener() {
+        driveForGoToSchool = findViewById(R.id.drive_go_to_school_btn);
+        driveForGoToHome = findViewById(R.id.drive_go_to_home_btn);
+        driveForGoToSchool.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 LinearLayout driver_default_linear = findViewById(R.id.driver_default);
@@ -80,6 +81,12 @@ public class DriverActivity extends BaseActivity{
                     }
                 });
                 startBeaconScan();
+            }
+        });
+        driveForGoToHome.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
             }
         });
     }
