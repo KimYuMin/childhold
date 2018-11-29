@@ -8,12 +8,14 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.content.LocalBroadcastManager;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.example.yuminkim.childhold.R;
 import com.example.yuminkim.childhold.model.Child;
@@ -23,6 +25,7 @@ import com.example.yuminkim.childhold.model.NotificationData;
 import com.example.yuminkim.childhold.network.ApiService;
 
 import com.example.yuminkim.childhold.sensor.CHBluetoothManager;
+import com.example.yuminkim.childhold.sensor.LocationTracker;
 import com.example.yuminkim.childhold.util.AlertUtil;
 import com.example.yuminkim.childhold.util.Constants;
 import com.example.yuminkim.childhold.util.PushMessageUtil;
@@ -48,6 +51,8 @@ public class DriverActivity extends BaseActivity{
     private Disposable disposable;
     private com.google.android.gms.maps.model.LatLng center;
     private String idx;
+    LocationTracker locationTracker;
+    public Handler mHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +63,7 @@ public class DriverActivity extends BaseActivity{
         childListForEndDrive = new ArrayList<>();
         childListForExit = new ArrayList<>();
 
+        mHandler = new Handler();
         drive_start_btn = findViewById(R.id.drive_start_btn);
         drive_start_btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -80,6 +86,10 @@ public class DriverActivity extends BaseActivity{
                     }
                 });
                 startBeaconScan();
+                locationTracker = new LocationTracker(DriverActivity.this, mHandler);
+                double lat = locationTracker.getLat();
+                double lng = locationTracker.getLng();
+                Toast.makeText(getApplicationContext(), "LOCATION : " + lat + " " + lng, Toast.LENGTH_SHORT).show();
             }
         });
     }
