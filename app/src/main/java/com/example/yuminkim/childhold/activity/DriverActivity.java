@@ -43,15 +43,12 @@ public class DriverActivity extends BaseActivity{
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        setContentView(R.layout.activity_driver);
         super.onCreate(savedInstanceState);
-
         idx = getIntent().getStringExtra(Constants.KEY_IDX);
         childArrayList = new ArrayList<>();
         childListForEndDrive = new ArrayList<>();
         childListForExit = new ArrayList<>();
-        setContentView(R.layout.activity_driver);
-        initMap();
-
 
         drive_start_btn = findViewById(R.id.drive_start_btn);
         drive_start_btn.setOnClickListener(new View.OnClickListener() {
@@ -144,6 +141,7 @@ public class DriverActivity extends BaseActivity{
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        super.onMapReady(googleMap);
         getChildList(Integer.parseInt(idx));
     }
 

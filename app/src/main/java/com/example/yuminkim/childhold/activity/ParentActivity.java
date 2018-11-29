@@ -13,8 +13,6 @@ import com.example.yuminkim.childhold.network.model.AbsentResponse;
 import com.example.yuminkim.childhold.util.Constants;
 import com.example.yuminkim.childhold.util.PushMessageUtil;
 import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -37,13 +35,12 @@ public class ParentActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_parent);
+        super.onCreate(savedInstanceState);
         idx = getIntent().getStringExtra(Constants.KEY_IDX);
         parent_locaion_btn = findViewById(R.id.parent_location_btn);
         parent_absent_btn = findViewById(R.id.parent_absent_btn);
         layout_cover_absent = findViewById(R.id.layout_cover_absent);
-        initMap();
         parent_locaion_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

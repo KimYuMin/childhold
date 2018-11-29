@@ -33,6 +33,7 @@ public abstract class BaseActivity extends Activity implements OnMapReadyCallbac
                 startActivity(new Intent(BaseActivity.this, LoginActivity.class));
             }
         });
+        initMap();
     }
 
     private static String[] permission_map = {
@@ -41,7 +42,7 @@ public abstract class BaseActivity extends Activity implements OnMapReadyCallbac
     };
 
     public void initMap(){
-        mapFr = (MapFragment)getFragmentManager().findFragmentById(R.id.parent_map);
+        mapFr = (MapFragment)getFragmentManager().findFragmentById(R.id.fragment_map);
         mapFr.getMapAsync(this);
     }
 
