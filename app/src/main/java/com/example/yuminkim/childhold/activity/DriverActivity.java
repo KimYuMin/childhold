@@ -2,7 +2,13 @@ package com.example.yuminkim.childhold.activity;
 
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -13,9 +19,11 @@ import com.example.yuminkim.childhold.R;
 import com.example.yuminkim.childhold.model.Child;
 import com.example.yuminkim.childhold.model.ChildListAdapter;
 import com.example.yuminkim.childhold.model.LatLng;
+import com.example.yuminkim.childhold.model.NotificationData;
 import com.example.yuminkim.childhold.network.ApiService;
 
 import com.example.yuminkim.childhold.sensor.CHBluetoothManager;
+import com.example.yuminkim.childhold.util.AlertUtil;
 import com.example.yuminkim.childhold.util.Constants;
 import com.example.yuminkim.childhold.util.PushMessageUtil;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -75,6 +83,48 @@ public class DriverActivity extends BaseActivity{
             }
         });
     }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        LocalBroadcastManager.getInstance(this).registerReceiver(
+                messageReceiver,
+                new IntentFilter(Constants.KEY_NOTI_FOR_DRIVER)
+        );
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(messageReceiver);
+    }
+
+    private BroadcastReceiver messageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String title = intent.getStringExtra("title");
+            String alert = intent.getStringExtra("alert");
+            NotificationData data = new NotificationData(intent.getStringExtra("custom"));
+            try {
+                String parentId = data.toJsonObject().getJSONObject("a").getString("id");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            AlertUtil.showAlert(DriverActivity.this, title, alert, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            }, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.dismiss();
+                }
+            }).show();
+        }
+    };
+
 
     //TODO: Check Bluetooth is ON?
     private void startBeaconScan() { // 여기가 비콘스캔인데...

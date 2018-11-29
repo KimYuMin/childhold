@@ -73,6 +73,7 @@ public class LoginActivity extends Activity {
         if (idx.equals("")) {
             inputContainer.setVisibility(View.VISIBLE);
         } else {
+            userType = PrefsUtil.getFromPrefs(this, PrefsUtil.KEY_USER_TYPE, "");
             updateDeviceId(idx);
         }
     }
@@ -115,6 +116,10 @@ public class LoginActivity extends Activity {
                                 PrefsUtil.KEY_IDX,
                                 loginResponse.idx
                         );
+                        PrefsUtil.saveToPrefs(LoginActivity.this,
+                                PrefsUtil.KEY_USER_TYPE,
+                                userType
+                        );
                         updateDeviceId(loginResponse.idx);
                      }
                 }, new Consumer<Throwable>() {
@@ -135,7 +140,6 @@ public class LoginActivity extends Activity {
                     .subscribe(new Consumer<BaseResponse>() {
                         @Override
                         public void accept(BaseResponse baseResponse) {
-                            Log.d("status", "status : " + baseResponse.status);
                             nextStep(idx);
                         }
                     }, new Consumer<Throwable>() {

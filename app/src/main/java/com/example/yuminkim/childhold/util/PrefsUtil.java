@@ -6,6 +6,8 @@ import android.preference.PreferenceManager;
 
 public class PrefsUtil {
     public static final String KEY_IDX = "idx";
+    public static final String KEY_USER_TYPE = "user_type";
+
     public static void saveToPrefs(Context context, String key, String value) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         final SharedPreferences.Editor editor = prefs.edit();
