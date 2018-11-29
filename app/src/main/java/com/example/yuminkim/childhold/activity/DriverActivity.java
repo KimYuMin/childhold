@@ -4,11 +4,7 @@ import android.Manifest;
 import android.app.Activity;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -26,12 +22,8 @@ import com.example.yuminkim.childhold.util.Constants;
 import com.example.yuminkim.childhold.util.PushMessageUtil;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,20 +32,16 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
-public class DriverActivity extends Activity implements OnMapReadyCallback {
-    static int REQ_PERMISSION_MAP = 1000;
-    MapFragment mapFr;
-    GoogleMap map;
-    Button drive_start_btn;
-    ListView childlist_view;
-    ChildListAdapter childListAdapter;
-    ArrayList<Child> childArrayList;
-    ArrayList<Child> childListForEndDrive;
-    ArrayList<Child> childListForExit;
+public class DriverActivity extends BaseActivity{
+    private Button drive_start_btn;
+    private ListView childlist_view;
+    private ChildListAdapter childListAdapter;
+    private ArrayList<Child> childArrayList;
+    private ArrayList<Child> childListForEndDrive;
+    private ArrayList<Child> childListForExit;
     private Disposable disposable;
-    private Disposable disposable2;
     private com.google.android.gms.maps.model.LatLng center;
-    String idx;
+    private String idx;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -156,60 +144,8 @@ public class DriverActivity extends Activity implements OnMapReadyCallback {
 
     }
 
-
-    private static String[] permission_map = {
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION
-    };
-
-    private boolean checkPermission(String[] requestPermission){
-        boolean[] requestResult = new boolean[requestPermission.length];
-        for(int i = 0; i < requestPermission.length; i++){
-            requestResult[i] = (ContextCompat.checkSelfPermission(this, requestPermission[i]) == PackageManager.PERMISSION_GRANTED);
-            if(!requestResult[i])
-                return false;
-        }
-        return true;
-    }
-
-    private void askPermission(String[] requestPermission, int requestCode){
-        ActivityCompat.requestPermissions(
-                this,
-                requestPermission,
-                requestCode
-        );
-    }
-
-    public void initMap(){
-        mapFr = (MapFragment)getFragmentManager().findFragmentById(R.id.driver_map);
-        mapFr.getMapAsync(this);
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults){
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        if(requestCode == REQ_PERMISSION_MAP){
-            if(grantResults.length > 0){
-                if(checkPermission(permission_map))
-                    map.setMyLocationEnabled(true);
-                else
-                    askPermission(permission_map, REQ_PERMISSION_MAP);
-            }
-        }
-    }
-
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        map = googleMap;
-        if(checkPermission(permission_map))
-            map.setMyLocationEnabled(true);
-        else
-            askPermission(permission_map, REQ_PERMISSION_MAP);
-        map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-        UiSettings uiSettings = map.getUiSettings();
-        uiSettings.setZoomControlsEnabled(true);
-        // child list 를 부르고 아이의 위치를 가져와야 맵을 줌하고 마커를 그릴 수 있음
         getChildList(Integer.parseInt(idx));
     }
 
@@ -291,9 +227,6 @@ public class DriverActivity extends Activity implements OnMapReadyCallback {
         super.onPause();
         if (disposable != null) {
             disposable.dispose();
-        }
-        if (disposable2 != null) {
-            disposable2.dispose();
         }
     }
 }

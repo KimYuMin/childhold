@@ -103,7 +103,6 @@ public class LoginActivity extends Activity {
         popupWindow.show();
     }
 
-    //FIXME: auto-login 체크해서 자동로그인 시키도록 변경(시연때는 필요할려나?)
     private void doLogin() {
         String code = passwordEditText.getText().toString();
         disposable = ApiService.getCOMMON_SERVICE().login(userType, code)

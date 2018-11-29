@@ -1,33 +1,20 @@
 package com.example.yuminkim.childhold.activity;
 
-import android.Manifest;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.view.View;
-import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
 import com.example.yuminkim.childhold.R;
 import com.example.yuminkim.childhold.model.LatLng;
 import com.example.yuminkim.childhold.network.ApiService;
 import com.example.yuminkim.childhold.network.model.AbsentResponse;
-import com.example.yuminkim.childhold.network.model.BaseResponse;
 import com.example.yuminkim.childhold.util.Constants;
 import com.example.yuminkim.childhold.util.PushMessageUtil;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -35,11 +22,7 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
-public class ParentActivity extends Activity implements OnMapReadyCallback {
-    static int REQ_PERMISSION_MAP = 1000;
-
-    MapFragment mapFr;
-    GoogleMap map;
+public class ParentActivity extends BaseActivity {
     double myLat;
     double myLng;
 
@@ -123,59 +106,5 @@ public class ParentActivity extends Activity implements OnMapReadyCallback {
                     }
                 }).create();
         alertDialog.show();
-    }
-
-    private static String[] permission_map = {
-            Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION
-    };
-
-    private boolean checkPermission(String[] requestPermission){
-        boolean[] requestResult = new boolean[requestPermission.length];
-        for(int i = 0; i < requestPermission.length; i++){
-            requestResult[i] = (ContextCompat.checkSelfPermission(this, requestPermission[i]) == PackageManager.PERMISSION_GRANTED);
-            if(!requestResult[i])
-                return false;
-        }
-        return true;
-    }
-
-    private void askPermission(String[] requestPermission, int requestCode){
-        ActivityCompat.requestPermissions(
-                this,
-                requestPermission,
-                requestCode
-        );
-    }
-
-    public void initMap(){
-        mapFr = (MapFragment)getFragmentManager().findFragmentById(R.id.parent_map);
-        mapFr.getMapAsync(this);
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults){
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        if(requestCode == REQ_PERMISSION_MAP){
-            if(grantResults.length > 0){
-                if(checkPermission(permission_map))
-                    map.setMyLocationEnabled(true);
-                else
-                    askPermission(permission_map, REQ_PERMISSION_MAP);
-            }
-        }
-    }
-
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        map = googleMap;
-        if(checkPermission(permission_map))
-            map.setMyLocationEnabled(true);
-        else
-            askPermission(permission_map, REQ_PERMISSION_MAP);
-        map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-        UiSettings uiSettings = map.getUiSettings();
-        uiSettings.setZoomControlsEnabled(true);
     }
 }
