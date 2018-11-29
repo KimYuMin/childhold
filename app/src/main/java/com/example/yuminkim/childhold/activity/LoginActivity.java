@@ -10,6 +10,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListPopupWindow;
 
 import com.example.yuminkim.childhold.R;
@@ -17,6 +18,7 @@ import com.example.yuminkim.childhold.network.ApiService;
 import com.example.yuminkim.childhold.network.model.BaseResponse;
 import com.example.yuminkim.childhold.network.model.LoginResponse;
 import com.example.yuminkim.childhold.util.Constants;
+import com.example.yuminkim.childhold.util.PrefsUtil;
 import com.onesignal.OSPermissionSubscriptionState;
 import com.onesignal.OneSignal;
 
@@ -34,6 +36,8 @@ public class LoginActivity extends Activity {
     private Disposable disposable;
     private Disposable loginDisposable;
 
+    private LinearLayout inputContainer;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,6 +49,7 @@ public class LoginActivity extends Activity {
         loginButton = findViewById(R.id.button_login);
         userTypeEditText = findViewById(R.id.edit_text_user_type);
         passwordEditText = findViewById(R.id.edit_text_password);
+        inputContainer = findViewById(R.id.container_input);
 
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -60,6 +65,16 @@ public class LoginActivity extends Activity {
                 showUserTypeWindow();
             }
         });
+        checkAutoLogin();
+    }
+
+    private void checkAutoLogin() {
+        String idx = PrefsUtil.getFromPrefs(this, PrefsUtil.KEY_IDX, "");
+        if (idx.equals("")) {
+            inputContainer.setVisibility(View.VISIBLE);
+        } else {
+            updateDeviceId(idx);
+        }
     }
 
     private void showUserTypeWindow() {
@@ -97,6 +112,10 @@ public class LoginActivity extends Activity {
                 .subscribe(new Consumer<LoginResponse>() {
                     @Override
                     public void accept(LoginResponse loginResponse) {
+                        PrefsUtil.saveToPrefs(LoginActivity.this,
+                                PrefsUtil.KEY_IDX,
+                                loginResponse.idx
+                        );
                         updateDeviceId(loginResponse.idx);
                      }
                 }, new Consumer<Throwable>() {

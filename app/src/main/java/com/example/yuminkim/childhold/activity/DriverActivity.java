@@ -126,7 +126,6 @@ public class DriverActivity extends Activity implements OnMapReadyCallback {
         });
     }
 
-    //TODO: Check Bluetooth is ON?
     private void BeaconScanForHome() { // 여기가 비콘스캔인데...
         final ArrayList<Child> childListForExit_copy = new ArrayList<>(childListForExit);
         CHBluetoothManager.getInstance(this).scanLeDeviceForExit(true, new ScanCallback() {
