@@ -199,6 +199,7 @@ public class DriverActivity extends BaseActivity{
                         childArrayList.clear();
                         childListForEndDrive.clear();
                         childListForExit.clear();
+                        map.clear();
                         double lat = 0, lng = 0;
                         for (Child c: children) {
                             lat += c.getLatLng().getLat();
