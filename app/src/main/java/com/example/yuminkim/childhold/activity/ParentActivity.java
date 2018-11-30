@@ -10,6 +10,7 @@ import com.example.yuminkim.childhold.R;
 import com.example.yuminkim.childhold.model.LatLng;
 import com.example.yuminkim.childhold.network.ApiService;
 import com.example.yuminkim.childhold.network.model.AbsentResponse;
+import com.example.yuminkim.childhold.network.model.AbsentStatusResponse;
 import com.example.yuminkim.childhold.util.Constants;
 import com.example.yuminkim.childhold.util.PushMessageUtil;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -28,6 +29,7 @@ public class ParentActivity extends BaseActivity {
     private com.google.android.gms.maps.model.LatLng center;
     Disposable disposable;
     Disposable disposable2;
+    Disposable disposable3;
     LatLng driver_location;
     String idx;
     boolean isAbsent = false;
@@ -41,6 +43,20 @@ public class ParentActivity extends BaseActivity {
         parent_locaion_btn = findViewById(R.id.parent_location_btn);
         parent_absent_btn = findViewById(R.id.parent_absent_btn);
         layout_cover_absent = findViewById(R.id.layout_cover_absent);
+        disposable3 = ApiService.getPARENT_SERVICE().getChildAbsentState(1)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<AbsentStatusResponse>() {
+                    @Override
+                    public void accept(AbsentStatusResponse absentStatusResponse) throws Exception {
+                        if(absentStatusResponse.isAbsent())
+                            isAbsent = true;
+                        else
+                            isAbsent = false;
+                        layout_cover_absent.setVisibility(isAbsent ? View.VISIBLE : View.GONE);
+                    }
+                });
+
         parent_locaion_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
