@@ -174,6 +174,7 @@ public class DriverActivity extends BaseActivity{
     }
 
     private void startBeaconScanForHome() { // 여기가 비콘스캔인데...
+        locationTracker.getLocation();
         final ArrayList<Child> childListForExit_copy = new ArrayList<>(childListForExit);
         CHBluetoothManager.getInstance(this).scanLeDeviceForExit(true, new ScanCallback() {
             @Override

@@ -49,7 +49,7 @@ public class PushMessageUtil {
         }
     }
 
-    public static void sendAbsentPushNotification(String driverId, String childId) {
+    public static void sendAbsentPushNotification(String driverId, String childId, String childName, boolean isRide) {
         OSPermissionSubscriptionState status = OneSignal.getPermissionSubscriptionState();
         boolean isSubscribed = status.getSubscriptionStatus().getSubscribed();
 
@@ -57,9 +57,10 @@ public class PushMessageUtil {
             return;
 
         try {
+            String comment = childName + (isRide ? "(이)가 탑승 할 예정입니다." : "(이)가 탑승하지 않을 예정입니다.");
             JSONObject notificationContent = new JSONObject(
                     "{'contents': " +
-                            "{'en': '탑승하지 않을 예정입니다. 운행에 참고바랍니다.'}," +
+                            "{'en': '" + comment + "운행에 참고바랍니다.'}," +
                             "'include_player_ids': ['" + driverId + "'], " +
                             "'headings': {'en': '승하차알림'}," +
                             "'data': { 'id': '" + childId + "' }" +

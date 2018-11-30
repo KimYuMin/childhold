@@ -51,9 +51,11 @@ public class LocationTracker extends Service implements LocationListener {
         this.driver_id = driver_id;
         getLocation();
     }
+
     public void Update(){
         getLocation();
     }
+
     public Location getLocation(){
         if(Build.VERSION.SDK_INT >= 23 &&
                 ContextCompat.checkSelfPermission(mContext, android.Manifest.permission.ACCESS_FINE_LOCATION ) != PackageManager.PERMISSION_GRANTED)
@@ -76,7 +78,7 @@ public class LocationTracker extends Service implements LocationListener {
                     }
                 }
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return location;
