@@ -27,8 +27,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.MainActivity" >
-        </activity>
         <activity android:name=".activity.DriverActivity" >
         </activity>
         <activity android:name=".activity.ParentActivity" >
@@ -43,7 +41,6 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyALxHogC5Q80o022NmmhVirK1YOf_T0M_A" />
         <!-- AIzaSyDkWlCdE1zfUwIj30dB9bwwyOCiEOGa0ug -->
-        <activity android:name=".activity.MapsActivity" />
 
         <!-- services -->
         <service android:name=".services.ChildholdFirebaseMessagingService">
