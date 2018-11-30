@@ -32,6 +32,7 @@ public class LoginActivity extends Activity {
     private EditText userTypeEditText;
     private EditText passwordEditText;
     private String[] USER_TYPES_TEXT = {"운전자", "보호자"};
+    private String[] USER_TYPES_KEYS = {"driver", "parent"};
     private String userType;
     private Disposable disposable;
     private Disposable loginDisposable;
@@ -70,10 +71,11 @@ public class LoginActivity extends Activity {
 
     private void checkAutoLogin() {
         String idx = PrefsUtil.getFromPrefs(this, PrefsUtil.KEY_IDX, "");
-        if (idx.equals("")) {
+        userType = PrefsUtil.getFromPrefs(this, PrefsUtil.KEY_USER_TYPE, "");
+        if (idx.equals("") && userType.equals("")) {
             inputContainer.setVisibility(View.VISIBLE);
         } else {
-            userType = PrefsUtil.getFromPrefs(this, PrefsUtil.KEY_USER_TYPE, "");
+
             updateDeviceId(idx);
         }
     }
@@ -94,9 +96,9 @@ public class LoginActivity extends Activity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 userTypeEditText.setText(USER_TYPES_TEXT[position]);
                 if (position == 0) {
-                    userType = "driver";
+                    userType = USER_TYPES_KEYS[0];
                 } else {
-                    userType = "parent";
+                    userType = USER_TYPES_KEYS[1];
                 }
                 popupWindow.dismiss();
             }
@@ -154,7 +156,7 @@ public class LoginActivity extends Activity {
     }
 
     private void nextStep(String idx) {
-        if (userType == "parent") {
+        if (userType.equals(USER_TYPES_KEYS[1])) {
             Intent intent = new Intent(LoginActivity.this, ParentActivity.class);
             intent.putExtra(Constants.KEY_IDX, idx);
             startActivity(intent);

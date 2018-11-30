@@ -100,6 +100,7 @@ public class DriverActivity extends BaseActivity{
         driveForGoToHome.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                locationTracker = new LocationTracker(DriverActivity.this, mHandler, idx);
                 startBeaconScanForHome();
             }
         });
@@ -182,6 +183,7 @@ public class DriverActivity extends BaseActivity{
                 String curDeviceId = result.getDevice().getAddress();
                 if (curDeviceId != null) {
                     for (Child child : childListForExit) {
+                        Log.d("push", "curDeviceId : " + curDeviceId + " , c d : " + child.getDeviceId());
                         if (child.getBeaconId().equals(curDeviceId)) {
                             childListForExit_copy.remove(child);
                         }
@@ -198,6 +200,7 @@ public class DriverActivity extends BaseActivity{
             public void scanEnd() {
                 for (Child child : childListForExit_copy){
                     PushMessageUtil.sendPushNotification(child.getDeviceId(), child.getName(), false);
+                    Log.d("push", child.getDeviceId());
                     childLocationUpdateDisposable = ApiService.getPARENT_SERVICE().updateChildLocation(child.getIdx(),
                             locationTracker.getLat(), locationTracker.getLng())
                             .subscribeOn(Schedulers.io())

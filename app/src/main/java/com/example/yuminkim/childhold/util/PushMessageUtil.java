@@ -22,7 +22,6 @@ public class PushMessageUtil {
                         "'include_player_ids': ['" + userId + "'], " +
                         "'headings': {'en': '승하차알림'}" +
                     "} ");
-            //"'big_picture': 'http://i.imgur.com/DKw1J2F.gif'}"
             OneSignal.postNotification(notificationContent, null);
         } catch (JSONException e) {
             e.printStackTrace();

@@ -30,6 +30,7 @@ public abstract class BaseActivity extends Activity implements OnMapReadyCallbac
             public void onClick(View v) {
                 finish();
                 PrefsUtil.removeFromPrefs(BaseActivity.this, PrefsUtil.KEY_IDX);
+                PrefsUtil.removeFromPrefs(BaseActivity.this, PrefsUtil.KEY_USER_TYPE);
                 startActivity(new Intent(BaseActivity.this, LoginActivity.class));
             }
         });

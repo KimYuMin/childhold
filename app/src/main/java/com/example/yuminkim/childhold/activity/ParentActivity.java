@@ -34,6 +34,7 @@ public class ParentActivity extends BaseActivity {
     String idx;
     boolean isAbsent = false;
     View layout_cover_absent;
+    String childName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,11 +49,12 @@ public class ParentActivity extends BaseActivity {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<AbsentStatusResponse>() {
                     @Override
-                    public void accept(AbsentStatusResponse absentStatusResponse) throws Exception {
+                    public void accept(AbsentStatusResponse absentStatusResponse) {
                         if(absentStatusResponse.isAbsent())
                             isAbsent = true;
                         else
                             isAbsent = false;
+                        childName = absentStatusResponse.name;
                         layout_cover_absent.setVisibility(isAbsent ? View.VISIBLE : View.GONE);
                     }
                 });
@@ -107,7 +109,7 @@ public class ParentActivity extends BaseActivity {
                                 .subscribe(new Consumer<AbsentResponse>() {
                                     @Override
                                     public void accept(AbsentResponse absentResponse) {
-                                        //PushMessageUtil.sendAbsentPushNotification(absentResponse.driverId, idx, childName, isAbsent);
+                                        PushMessageUtil.sendAbsentPushNotification(absentResponse.driverId, idx, childName, isAbsent);
                                     }
                                 });
                         dialogInterface.dismiss();
