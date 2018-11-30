@@ -50,12 +50,7 @@ public class ParentActivity extends BaseActivity {
                 .subscribe(new Consumer<AbsentStatusResponse>() {
                     @Override
                     public void accept(AbsentStatusResponse absentStatusResponse) {
-                        if(absentStatusResponse.isAbsent())
-                            isAbsent = true;
-                        else
-                            isAbsent = false;
-                        childName = absentStatusResponse.name;
-                        layout_cover_absent.setVisibility(isAbsent ? View.VISIBLE : View.GONE);
+                        processChildAbsentState(absentStatusResponse);
                     }
                 });
 
@@ -69,18 +64,7 @@ public class ParentActivity extends BaseActivity {
                         .subscribe(new Consumer<LatLng>() {
                             @Override
                             public void accept(LatLng latLng) {
-                                double lat = 0, lng = 0;
-                                lat += latLng.getLat();
-                                lng += latLng.getLng();
-                                map.addMarker( new MarkerOptions().position(
-                                        new com.google.android.gms.maps.model.LatLng(
-                                                latLng.getLat(),
-                                                latLng.getLng()
-                                        )
-                                        ).title(String.format("기사위치"))
-                                );
-                                center = new com.google.android.gms.maps.model.LatLng(lat, lng);
-                                map.animateCamera(CameraUpdateFactory.newLatLngZoom(center, 14));
+                                processUpdateDriverLocation(latLng);
                             }
                         });
             }
@@ -92,6 +76,30 @@ public class ParentActivity extends BaseActivity {
                 callAbsentDialog();
             }
         });
+    }
+
+    private void processChildAbsentState(AbsentStatusResponse absentStatusResponse) {
+        if(absentStatusResponse.isAbsent())
+            isAbsent = true;
+        else
+            isAbsent = false;
+        childName = absentStatusResponse.name;
+        layout_cover_absent.setVisibility(isAbsent ? View.VISIBLE : View.GONE);
+    }
+
+    private void processUpdateDriverLocation(LatLng latLng) {
+        double lat = 0, lng = 0;
+        lat += latLng.getLat();
+        lng += latLng.getLng();
+        map.addMarker( new MarkerOptions().position(
+                new com.google.android.gms.maps.model.LatLng(
+                        latLng.getLat(),
+                        latLng.getLng()
+                )
+                ).title(String.format("기사위치"))
+        );
+        center = new com.google.android.gms.maps.model.LatLng(lat, lng);
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(center, 14));
     }
 
     private void callAbsentDialog() {
