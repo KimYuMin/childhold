@@ -2,6 +2,8 @@ package com.example.yuminkim.childhold.activity;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.RelativeLayout;
@@ -14,6 +16,8 @@ import com.example.yuminkim.childhold.network.model.AbsentStatusResponse;
 import com.example.yuminkim.childhold.util.Constants;
 import com.example.yuminkim.childhold.util.PushMessageUtil;
 import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -70,12 +74,16 @@ public class ParentActivity extends BaseActivity {
                                 double lat = 0, lng = 0;
                                 lat += latLng.getLat();
                                 lng += latLng.getLng();
+
+                                BitmapDrawable bitmapdraw=(BitmapDrawable)getResources().getDrawable(R.drawable.mini_bus);
+                                Bitmap b=bitmapdraw.getBitmap();
+                                Bitmap smallMarker = Bitmap.createScaledBitmap(b, 110, 110, false);
                                 map.addMarker( new MarkerOptions().position(
-                                        new com.google.android.gms.maps.model.LatLng(
-                                                latLng.getLat(),
-                                                latLng.getLng()
-                                        )
-                                        ).title(String.format("기사위치"))
+                                            new com.google.android.gms.maps.model.LatLng(
+                                                    latLng.getLat(),
+                                                    latLng.getLng()
+                                            )
+                                        ).title(String.format("기사위치")).icon(BitmapDescriptorFactory.fromBitmap(smallMarker))
                                 );
                                 center = new com.google.android.gms.maps.model.LatLng(lat, lng);
                                 map.animateCamera(CameraUpdateFactory.newLatLngZoom(center, 14));
@@ -95,7 +103,7 @@ public class ParentActivity extends BaseActivity {
     private void callAbsentDialog() {
         final AlertDialog alertDialog = new AlertDialog.Builder(ParentActivity.this)
                 .setTitle("부재 알림")
-                .setMessage("아이의 상태를 (" + (isAbsent ? "승차하지않음" : "승차함") + ") 으로 변경하시겠습니까?")
+                .setMessage("아이의 상태를 (" + (isAbsent ? "승차함" : "승차하지않음") + ") 으로 변경하시겠습니까?")
                 .setPositiveButton("확인", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {

@@ -10,6 +10,7 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -232,6 +233,8 @@ public class DriverActivity extends BaseActivity{
                                     )
                                 ).title(String.format("%d", c.getIdx()))
                             );
+                            Log.d(" LAT ", String.valueOf(c.getLatLng().getLat()));
+                            Log.d(" LNG ", String.valueOf(c.getLatLng().getLng()));
                         }
                         center = new com.google.android.gms.maps.model.LatLng(
                                 lat / (double) children.size(),
