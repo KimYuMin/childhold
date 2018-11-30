@@ -13,4 +13,9 @@ interface ParentService {
 
     @GET("update_child_absent.php")
     fun updateChildAbsent(@Query("parent_id") parentId: Int, @Query("absent") absent: Int): Observable<AbsentResponse>
+
+    @GET("update_child_location.php")
+    fun updateChildLocation(@Query("child_id") childId: Int,
+                            @Query("lat") lat: Double,
+                            @Query("lng") lng: Double): Observable<BaseResponse>
 }

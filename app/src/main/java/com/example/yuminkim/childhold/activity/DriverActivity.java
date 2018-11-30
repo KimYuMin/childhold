@@ -10,6 +10,7 @@ import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -23,6 +24,7 @@ import com.example.yuminkim.childhold.model.ChildListAdapter;
 import com.example.yuminkim.childhold.model.LatLng;
 import com.example.yuminkim.childhold.network.ApiService;
 
+import com.example.yuminkim.childhold.network.model.BaseResponse;
 import com.example.yuminkim.childhold.sensor.CHBluetoothManager;
 import com.example.yuminkim.childhold.sensor.LocationTracker;
 import com.example.yuminkim.childhold.util.AlertUtil;
@@ -49,6 +51,7 @@ public class DriverActivity extends BaseActivity{
     private ArrayList<Child> childListForEndDrive;
     private ArrayList<Child> childListForExit;
     private Disposable disposable;
+    private Disposable childLocationUpdateDisposable;
     private com.google.android.gms.maps.model.LatLng center;
     private String idx;
     LocationTracker locationTracker;
@@ -87,7 +90,7 @@ public class DriverActivity extends BaseActivity{
                         map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16));
                     }
                 });
-                startBeaconScan();
+                startBeaconScanForGoToSchool();
                 locationTracker = new LocationTracker(DriverActivity.this, mHandler, idx);
                 double lat = locationTracker.getLat();
                 double lng = locationTracker.getLng();
@@ -97,7 +100,7 @@ public class DriverActivity extends BaseActivity{
         driveForGoToHome.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                startBeaconScanForHome();
             }
         });
     }
@@ -139,7 +142,7 @@ public class DriverActivity extends BaseActivity{
 
 
     //TODO: Check Bluetooth is ON?
-    private void startBeaconScan() { // 여기가 비콘스캔인데...
+    private void startBeaconScanForGoToSchool() { // 여기가 비콘스캔인데...
         CHBluetoothManager.getInstance(this).scanLeDevice(true, new ScanCallback() {
             @Override
             public void onScanResult(int callbackType, ScanResult result) {
@@ -170,7 +173,7 @@ public class DriverActivity extends BaseActivity{
         });
     }
 
-    private void BeaconScanForHome() { // 여기가 비콘스캔인데...
+    private void startBeaconScanForHome() { // 여기가 비콘스캔인데...
         final ArrayList<Child> childListForExit_copy = new ArrayList<>(childListForExit);
         CHBluetoothManager.getInstance(this).scanLeDeviceForExit(true, new ScanCallback() {
             @Override
@@ -192,8 +195,23 @@ public class DriverActivity extends BaseActivity{
 
             @Override
             public void scanEnd() {
-                for(Child child : childListForExit_copy){
-                  PushMessageUtil.sendPushNotification(child.getDeviceId(), child.getName(), false);
+                for (Child child : childListForExit_copy){
+                    PushMessageUtil.sendPushNotification(child.getDeviceId(), child.getName(), false);
+                    childLocationUpdateDisposable = ApiService.getPARENT_SERVICE().updateChildLocation(child.getIdx(),
+                            locationTracker.getLat(), locationTracker.getLng())
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(new Consumer<BaseResponse>() {
+                                @Override
+                                public void accept(BaseResponse baseResponse) {
+                                    Log.d("update", baseResponse.status);
+                                }
+                            }, new Consumer<Throwable>() {
+                                @Override
+                                public void accept(Throwable throwable) {
+
+                                }
+                            });
                 }
             }
         });
@@ -289,6 +307,10 @@ public class DriverActivity extends BaseActivity{
         super.onPause();
         if (disposable != null) {
             disposable.dispose();
+        }
+
+        if (childLocationUpdateDisposable != null) {
+            childLocationUpdateDisposable.dispose();
         }
     }
 }
