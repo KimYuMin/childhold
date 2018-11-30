@@ -97,9 +97,28 @@ public class DriverActivity extends BaseActivity{
                 Toast.makeText(getApplicationContext(), "LOCATION : " + lat + " " + lng, Toast.LENGTH_SHORT).show();
             }
         });
+
         driveForGoToHome.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                LinearLayout driver_default_linear = findViewById(R.id.driver_default);
+                driver_default_linear.setVisibility(View.GONE);
+                LinearLayout driver_drive_linear = findViewById(R.id.driver_drive);
+                driver_drive_linear.setVisibility(View.VISIBLE);
+
+                childlist_view = findViewById(R.id.child_list);
+                childListAdapter = new ChildListAdapter(DriverActivity.this, childListForExit);
+                childlist_view.setAdapter(childListAdapter);
+                childlist_view.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        LatLng src = childArrayList.get(position).getLatLng();
+                        com.google.android.gms.maps.model.LatLng latLng =
+                                new com.google.android.gms.maps.model.LatLng(src.getLat(), src.getLng());
+                        map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16));
+                    }
+                });
+                startBeaconScanForGoToSchool();
                 locationTracker = new LocationTracker(DriverActivity.this, mHandler, idx);
                 startBeaconScanForHome();
             }
@@ -216,6 +235,10 @@ public class DriverActivity extends BaseActivity{
 
                                 }
                             });
+                    for (Child child1 : childListForExit_copy) {
+                        childListForExit.remove(child1);
+                    }
+                    childListAdapter.notifyDataSetChanged();
                 }
             }
         });
