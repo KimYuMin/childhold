@@ -38,6 +38,7 @@ public class ParentActivity extends BaseActivity {
     String idx;
     boolean isAbsent = false;
     View layout_cover_absent;
+    String childName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,12 +53,8 @@ public class ParentActivity extends BaseActivity {
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Consumer<AbsentStatusResponse>() {
                     @Override
-                    public void accept(AbsentStatusResponse absentStatusResponse) throws Exception {
-                        if(absentStatusResponse.isAbsent())
-                            isAbsent = true;
-                        else
-                            isAbsent = false;
-                        layout_cover_absent.setVisibility(isAbsent ? View.VISIBLE : View.GONE);
+                    public void accept(AbsentStatusResponse absentStatusResponse) {
+                        processChildAbsentState(absentStatusResponse);
                     }
                 });
 
@@ -71,22 +68,7 @@ public class ParentActivity extends BaseActivity {
                         .subscribe(new Consumer<LatLng>() {
                             @Override
                             public void accept(LatLng latLng) {
-                                double lat = 0, lng = 0;
-                                lat += latLng.getLat();
-                                lng += latLng.getLng();
-
-                                BitmapDrawable bitmapdraw=(BitmapDrawable)getResources().getDrawable(R.drawable.mini_bus);
-                                Bitmap b=bitmapdraw.getBitmap();
-                                Bitmap smallMarker = Bitmap.createScaledBitmap(b, 110, 110, false);
-                                map.addMarker( new MarkerOptions().position(
-                                            new com.google.android.gms.maps.model.LatLng(
-                                                    latLng.getLat(),
-                                                    latLng.getLng()
-                                            )
-                                        ).title(String.format("기사위치")).icon(BitmapDescriptorFactory.fromBitmap(smallMarker))
-                                );
-                                center = new com.google.android.gms.maps.model.LatLng(lat, lng);
-                                map.animateCamera(CameraUpdateFactory.newLatLngZoom(center, 14));
+                                processUpdateDriverLocation(latLng);
                             }
                         });
             }
@@ -98,6 +80,34 @@ public class ParentActivity extends BaseActivity {
                 callAbsentDialog();
             }
         });
+    }
+
+    private void processChildAbsentState(AbsentStatusResponse absentStatusResponse) {
+        if(absentStatusResponse.isAbsent())
+            isAbsent = true;
+        else
+            isAbsent = false;
+        childName = absentStatusResponse.name;
+        layout_cover_absent.setVisibility(isAbsent ? View.VISIBLE : View.GONE);
+    }
+
+    private void processUpdateDriverLocation(LatLng latLng) {
+        double lat = 0, lng = 0;
+        lat += latLng.getLat();
+        lng += latLng.getLng();
+
+        BitmapDrawable bitmapdraw=(BitmapDrawable)getResources().getDrawable(R.drawable.mini_bus);
+        Bitmap b=bitmapdraw.getBitmap();
+        Bitmap smallMarker = Bitmap.createScaledBitmap(b, 110, 110, false);
+        map.addMarker( new MarkerOptions().position(
+                new com.google.android.gms.maps.model.LatLng(
+                        latLng.getLat(),
+                        latLng.getLng()
+                )
+                ).title(String.format("기사위치")).icon(BitmapDescriptorFactory.fromBitmap(smallMarker))
+        );
+        center = new com.google.android.gms.maps.model.LatLng(lat, lng);
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(center, 14));
     }
 
     private void callAbsentDialog() {
@@ -115,7 +125,7 @@ public class ParentActivity extends BaseActivity {
                                 .subscribe(new Consumer<AbsentResponse>() {
                                     @Override
                                     public void accept(AbsentResponse absentResponse) {
-                                        PushMessageUtil.sendAbsentPushNotification(absentResponse.driverId, idx);
+                                        PushMessageUtil.sendAbsentPushNotification(absentResponse.driverId, idx, childName, isAbsent);
                                     }
                                 });
                         dialogInterface.dismiss();

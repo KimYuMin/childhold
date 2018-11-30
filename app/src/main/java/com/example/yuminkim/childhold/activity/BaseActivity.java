@@ -11,7 +11,7 @@ import android.support.v4.content.ContextCompat;
 import android.view.View;
 
 import com.example.yuminkim.childhold.R;
-import com.example.yuminkim.childhold.util.PrefsUtil;
+import com.example.yuminkim.childhold.util.SharedPrefsUtil;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -29,7 +29,8 @@ public abstract class BaseActivity extends Activity implements OnMapReadyCallbac
             @Override
             public void onClick(View v) {
                 finish();
-                PrefsUtil.removeFromPrefs(BaseActivity.this, PrefsUtil.KEY_IDX);
+                SharedPrefsUtil.removeFromPrefs(BaseActivity.this, SharedPrefsUtil.KEY_IDX);
+                SharedPrefsUtil.removeFromPrefs(BaseActivity.this, SharedPrefsUtil.KEY_USER_TYPE);
                 startActivity(new Intent(BaseActivity.this, LoginActivity.class));
             }
         });

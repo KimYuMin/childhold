@@ -1,5 +1,6 @@
 package com.example.yuminkim.childhold.activity;
 
+import android.app.ProgressDialog;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
 import android.content.BroadcastReceiver;
@@ -24,6 +25,7 @@ import com.example.yuminkim.childhold.model.ChildListAdapter;
 import com.example.yuminkim.childhold.model.LatLng;
 import com.example.yuminkim.childhold.network.ApiService;
 
+import com.example.yuminkim.childhold.network.model.BaseResponse;
 import com.example.yuminkim.childhold.sensor.CHBluetoothManager;
 import com.example.yuminkim.childhold.sensor.LocationTracker;
 import com.example.yuminkim.childhold.util.AlertUtil;
@@ -50,10 +52,17 @@ public class DriverActivity extends BaseActivity{
     private ArrayList<Child> childListForEndDrive;
     private ArrayList<Child> childListForExit;
     private Disposable disposable;
+    private Disposable childLocationUpdateDisposable;
     private com.google.android.gms.maps.model.LatLng center;
     private String idx;
     LocationTracker locationTracker;
     public Handler mHandler;
+
+
+    private LinearLayout driveDefaultContainer;
+    private LinearLayout driveDriveContainer;
+    private LinearLayout driveEndContainer;
+    ProgressDialog progressDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +73,10 @@ public class DriverActivity extends BaseActivity{
         childListForEndDrive = new ArrayList<>();
         childListForExit = new ArrayList<>();
 
+        driveDefaultContainer = findViewById(R.id.driver_default);
+        driveDriveContainer = findViewById(R.id.driver_drive);
+        driveEndContainer = findViewById(R.id.drive_end_container);
+
         mHandler = new Handler();
         driveForGoToSchool = findViewById(R.id.drive_go_to_school_btn);
         driveForGoToHome = findViewById(R.id.drive_go_to_home_btn);
@@ -71,10 +84,9 @@ public class DriverActivity extends BaseActivity{
 
             @Override
             public void onClick(View view) {
-                LinearLayout driver_default_linear = findViewById(R.id.driver_default);
-                driver_default_linear.setVisibility(View.GONE);
-                LinearLayout driver_drive_linear = findViewById(R.id.driver_drive);
-                driver_drive_linear.setVisibility(View.VISIBLE);
+                driveDefaultContainer.setVisibility(View.GONE);
+                driveDriveContainer.setVisibility(View.VISIBLE);
+                driveEndContainer.setVisibility(View.GONE);
 
                 childlist_view = findViewById(R.id.child_list);
                 childListAdapter = new ChildListAdapter(DriverActivity.this, childArrayList);
@@ -88,17 +100,47 @@ public class DriverActivity extends BaseActivity{
                         map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16));
                     }
                 });
-                startBeaconScan();
+                startBeaconScanForGoToSchool();
                 locationTracker = new LocationTracker(DriverActivity.this, mHandler, idx);
                 double lat = locationTracker.getLat();
                 double lng = locationTracker.getLng();
                 Toast.makeText(getApplicationContext(), "LOCATION : " + lat + " " + lng, Toast.LENGTH_SHORT).show();
             }
         });
+
         driveForGoToHome.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                driveDefaultContainer.setVisibility(View.GONE);
+                driveDriveContainer.setVisibility(View.VISIBLE);
+                driveEndContainer.setVisibility(View.GONE);
 
+                childlist_view = findViewById(R.id.child_list);
+                childListAdapter = new ChildListAdapter(DriverActivity.this, childListForExit);
+                childlist_view.setAdapter(childListAdapter);
+                childlist_view.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        LatLng src = childArrayList.get(position).getLatLng();
+                        com.google.android.gms.maps.model.LatLng latLng =
+                                new com.google.android.gms.maps.model.LatLng(src.getLat(), src.getLng());
+                        map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16));
+                    }
+                });
+                startBeaconScanForGoToSchool();
+                locationTracker = new LocationTracker(DriverActivity.this, mHandler, idx);
+                startBeaconScanForHome();
+            }
+        });
+
+        findViewById(R.id.drive_end_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                progressDialog = new ProgressDialog(DriverActivity.this);
+                progressDialog.setMessage("남아있는 아이를 확인중입니다.");
+                progressDialog.create();
+                progressDialog.show();
+                driveEnd();
             }
         });
     }
@@ -140,7 +182,7 @@ public class DriverActivity extends BaseActivity{
 
 
     //TODO: Check Bluetooth is ON?
-    private void startBeaconScan() { // 여기가 비콘스캔인데...
+    private void startBeaconScanForGoToSchool() { // 여기가 비콘스캔인데...
         CHBluetoothManager.getInstance(this).scanLeDevice(true, new ScanCallback() {
             @Override
             public void onScanResult(int callbackType, ScanResult result) {
@@ -160,6 +202,10 @@ public class DriverActivity extends BaseActivity{
                             childListAdapter.notifyDataSetChanged();
                         }
                     }
+                } else {
+                    driveDefaultContainer.setVisibility(View.GONE);
+                    driveDriveContainer.setVisibility(View.GONE);
+                    driveEndContainer.setVisibility(View.VISIBLE);
                 }
             }
 
@@ -171,7 +217,8 @@ public class DriverActivity extends BaseActivity{
         });
     }
 
-    private void BeaconScanForHome() { // 여기가 비콘스캔인데...
+    private void startBeaconScanForHome() { // 여기가 비콘스캔인데...
+        locationTracker.getLocation();
         final ArrayList<Child> childListForExit_copy = new ArrayList<>(childListForExit);
         CHBluetoothManager.getInstance(this).scanLeDeviceForExit(true, new ScanCallback() {
             @Override
@@ -179,6 +226,7 @@ public class DriverActivity extends BaseActivity{
                 String curDeviceId = result.getDevice().getAddress();
                 if (curDeviceId != null) {
                     for (Child child : childListForExit) {
+                        Log.d("push", "curDeviceId : " + curDeviceId + " , c d : " + child.getDeviceId());
                         if (child.getBeaconId().equals(curDeviceId)) {
                             childListForExit_copy.remove(child);
                         }
@@ -193,8 +241,33 @@ public class DriverActivity extends BaseActivity{
 
             @Override
             public void scanEnd() {
-                for(Child child : childListForExit_copy){
-                  PushMessageUtil.sendPushNotification(child.getDeviceId(), child.getName(), false);
+                for (Child child : childListForExit_copy){
+                    PushMessageUtil.sendPushNotification(child.getDeviceId(), child.getName(), false);
+                    Log.d("push", child.getDeviceId());
+                    childLocationUpdateDisposable = ApiService.getPARENT_SERVICE().updateChildLocation(child.getIdx(),
+                            locationTracker.getLat(), locationTracker.getLng())
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(new Consumer<BaseResponse>() {
+                                @Override
+                                public void accept(BaseResponse baseResponse) {
+                                    Log.d("update", baseResponse.status);
+                                }
+                            }, new Consumer<Throwable>() {
+                                @Override
+                                public void accept(Throwable throwable) {
+
+                                }
+                            });
+                    for (Child child1 : childListForExit_copy) {
+                        childListForExit.remove(child1);
+                    }
+                    childListAdapter.notifyDataSetChanged();
+                    if (childListForExit.isEmpty()) {
+                        driveDefaultContainer.setVisibility(View.GONE);
+                        driveDriveContainer.setVisibility(View.GONE);
+                        driveEndContainer.setVisibility(View.VISIBLE);
+                    }
                 }
             }
         });
@@ -274,9 +347,18 @@ public class DriverActivity extends BaseActivity{
                         }
                     }
                     PushMessageUtil.sendPushNotificationForSafetyEnd(ids);
-                    //TODO: 아이가 모두 내렸음 끝 !
+                    progressDialog.dismiss();
+                    Toast.makeText(DriverActivity.this, "남아있는 아이가 없습니다.", Toast.LENGTH_SHORT).show();
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            driveDefaultContainer.setVisibility(View.VISIBLE);
+                            driveDriveContainer.setVisibility(View.GONE);
+                            driveEndContainer.setVisibility(View.GONE);
+                        }
+                    }, 1000);
                 } else {
-                    //TODO: 아이가 아직 남아있음 다시 스캔을 돌리도록 유도 !
+                    Toast.makeText(DriverActivity.this, "아이가 남아있습니다. 다시 한번 스캔해보세요.", Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -292,6 +374,10 @@ public class DriverActivity extends BaseActivity{
         super.onPause();
         if (disposable != null) {
             disposable.dispose();
+        }
+
+        if (childLocationUpdateDisposable != null) {
+            childLocationUpdateDisposable.dispose();
         }
     }
 }

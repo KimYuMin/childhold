@@ -119,6 +119,31 @@
 
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/drive_end_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_weight="3.5"
+                android:text="운행이 완료되었습니다. \n남아있는 아이가 있는지 확인 해주세요."/>
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:id="@+id/drive_end_button"
+                android:text="운행 종료"
+                android:background="#E9AA0D"
+                android:layout_marginBottom="20dp"/>
+
+        </LinearLayout>
+
     </FrameLayout>
 
 </LinearLayout>
