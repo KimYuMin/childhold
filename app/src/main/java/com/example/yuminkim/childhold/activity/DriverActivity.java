@@ -1,5 +1,6 @@
 package com.example.yuminkim.childhold.activity;
 
+import android.app.ProgressDialog;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
 import android.content.BroadcastReceiver;
@@ -57,6 +58,12 @@ public class DriverActivity extends BaseActivity{
     LocationTracker locationTracker;
     public Handler mHandler;
 
+
+    private LinearLayout driveDefaultContainer;
+    private LinearLayout driveDriveContainer;
+    private LinearLayout driveEndContainer;
+    ProgressDialog progressDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setContentView(R.layout.activity_driver);
@@ -66,6 +73,10 @@ public class DriverActivity extends BaseActivity{
         childListForEndDrive = new ArrayList<>();
         childListForExit = new ArrayList<>();
 
+        driveDefaultContainer = findViewById(R.id.driver_default);
+        driveDriveContainer = findViewById(R.id.driver_drive);
+        driveEndContainer = findViewById(R.id.drive_end_container);
+
         mHandler = new Handler();
         driveForGoToSchool = findViewById(R.id.drive_go_to_school_btn);
         driveForGoToHome = findViewById(R.id.drive_go_to_home_btn);
@@ -73,10 +84,9 @@ public class DriverActivity extends BaseActivity{
 
             @Override
             public void onClick(View view) {
-                LinearLayout driver_default_linear = findViewById(R.id.driver_default);
-                driver_default_linear.setVisibility(View.GONE);
-                LinearLayout driver_drive_linear = findViewById(R.id.driver_drive);
-                driver_drive_linear.setVisibility(View.VISIBLE);
+                driveDefaultContainer.setVisibility(View.GONE);
+                driveDriveContainer.setVisibility(View.VISIBLE);
+                driveEndContainer.setVisibility(View.GONE);
 
                 childlist_view = findViewById(R.id.child_list);
                 childListAdapter = new ChildListAdapter(DriverActivity.this, childArrayList);
@@ -101,10 +111,9 @@ public class DriverActivity extends BaseActivity{
         driveForGoToHome.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                LinearLayout driver_default_linear = findViewById(R.id.driver_default);
-                driver_default_linear.setVisibility(View.GONE);
-                LinearLayout driver_drive_linear = findViewById(R.id.driver_drive);
-                driver_drive_linear.setVisibility(View.VISIBLE);
+                driveDefaultContainer.setVisibility(View.GONE);
+                driveDriveContainer.setVisibility(View.VISIBLE);
+                driveEndContainer.setVisibility(View.GONE);
 
                 childlist_view = findViewById(R.id.child_list);
                 childListAdapter = new ChildListAdapter(DriverActivity.this, childListForExit);
@@ -121,6 +130,17 @@ public class DriverActivity extends BaseActivity{
                 startBeaconScanForGoToSchool();
                 locationTracker = new LocationTracker(DriverActivity.this, mHandler, idx);
                 startBeaconScanForHome();
+            }
+        });
+
+        findViewById(R.id.drive_end_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                progressDialog = new ProgressDialog(DriverActivity.this);
+                progressDialog.setMessage("남아있는 아이를 확인중입니다.");
+                progressDialog.create();
+                progressDialog.show();
+                driveEnd();
             }
         });
     }
@@ -182,6 +202,10 @@ public class DriverActivity extends BaseActivity{
                             childListAdapter.notifyDataSetChanged();
                         }
                     }
+                } else {
+                    driveDefaultContainer.setVisibility(View.GONE);
+                    driveDriveContainer.setVisibility(View.GONE);
+                    driveEndContainer.setVisibility(View.VISIBLE);
                 }
             }
 
@@ -239,6 +263,11 @@ public class DriverActivity extends BaseActivity{
                         childListForExit.remove(child1);
                     }
                     childListAdapter.notifyDataSetChanged();
+                    if (childListForExit.isEmpty()) {
+                        driveDefaultContainer.setVisibility(View.GONE);
+                        driveDriveContainer.setVisibility(View.GONE);
+                        driveEndContainer.setVisibility(View.VISIBLE);
+                    }
                 }
             }
         });
@@ -316,9 +345,18 @@ public class DriverActivity extends BaseActivity{
                         }
                     }
                     PushMessageUtil.sendPushNotificationForSafetyEnd(ids);
-                    //TODO: 아이가 모두 내렸음 끝 !
+                    progressDialog.dismiss();
+                    Toast.makeText(DriverActivity.this, "남아있는 아이가 없습니다.", Toast.LENGTH_SHORT).show();
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            driveDefaultContainer.setVisibility(View.VISIBLE);
+                            driveDriveContainer.setVisibility(View.GONE);
+                            driveEndContainer.setVisibility(View.GONE);
+                        }
+                    }, 1000);
                 } else {
-                    //TODO: 아이가 아직 남아있음 다시 스캔을 돌리도록 유도 !
+                    Toast.makeText(DriverActivity.this, "아이가 남아있습니다. 다시 한번 스캔해보세요.", Toast.LENGTH_SHORT).show();
                 }
             }
 

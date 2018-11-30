@@ -109,9 +109,9 @@ public class CHBluetoothManager {
                     @Override
                     public void onScanResult(int callbackType, ScanResult result) {
                         super.onScanResult(callbackType, result);
-                        callback.driveEnd(remainChildCount == 0);
                     }
                 });
+                callback.driveEnd(remainChildCount == 0);
             }
         }, SCAN_PERIOD);
 
