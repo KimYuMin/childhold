@@ -1,5 +1,6 @@
 package com.example.yuminkim.childhold.network
 
+import com.example.yuminkim.childhold.model.ChildLocationResponse
 import com.example.yuminkim.childhold.model.LatLng
 import com.example.yuminkim.childhold.network.model.AbsentResponse
 import com.example.yuminkim.childhold.network.model.AbsentStatusResponse
@@ -23,4 +24,6 @@ interface ParentService {
     @GET("get_absent_state.php")
     fun getChildAbsentState(@Query("parent_id") parentId: Int): Observable<AbsentStatusResponse>
 
+    @GET("get_child_location.php")
+    fun getChildLocation(@Query("parent_id") parentId: Int): Observable<ChildLocationResponse>
 }

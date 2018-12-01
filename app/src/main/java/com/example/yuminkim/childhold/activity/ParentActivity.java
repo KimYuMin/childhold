@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.RelativeLayout;
 
 import com.example.yuminkim.childhold.R;
+import com.example.yuminkim.childhold.model.ChildLocationResponse;
 import com.example.yuminkim.childhold.model.LatLng;
 import com.example.yuminkim.childhold.network.ApiService;
 import com.example.yuminkim.childhold.network.model.AbsentResponse;
@@ -17,7 +18,6 @@ import com.example.yuminkim.childhold.util.Constants;
 import com.example.yuminkim.childhold.util.PushMessageUtil;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -26,28 +26,27 @@ import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 
 public class ParentActivity extends BaseActivity {
-    double myLat;
-    double myLng;
-
-    RelativeLayout parent_locaion_btn, parent_absent_btn;
+    RelativeLayout childLocationButton, parent_absent_btn;
     private com.google.android.gms.maps.model.LatLng center;
     Disposable disposable;
     Disposable disposable2;
     Disposable disposable3;
-    LatLng driver_location;
+    Disposable disposableChild;
     String idx;
     boolean isAbsent = false;
     View layout_cover_absent;
     String childName;
+    double childLat, childLng, busLat, busLng;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setContentView(R.layout.activity_parent);
         super.onCreate(savedInstanceState);
         idx = getIntent().getStringExtra(Constants.KEY_IDX);
-        parent_locaion_btn = findViewById(R.id.parent_location_btn);
+        childLocationButton = findViewById(R.id.child_location_btn);
         parent_absent_btn = findViewById(R.id.parent_absent_btn);
         layout_cover_absent = findViewById(R.id.layout_cover_absent);
+
         disposable3 = ApiService.getPARENT_SERVICE().getChildAbsentState(1)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -58,19 +57,10 @@ public class ParentActivity extends BaseActivity {
                     }
                 });
 
-        parent_locaion_btn.setOnClickListener(new View.OnClickListener() {
+        childLocationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (isAbsent) return;
-                disposable = ApiService.getPARENT_SERVICE().getDriverLocation(1)
-                        .subscribeOn(Schedulers.io())
-                        .observeOn(AndroidSchedulers.mainThread())
-                        .subscribe(new Consumer<LatLng>() {
-                            @Override
-                            public void accept(LatLng latLng) {
-                                processUpdateDriverLocation(latLng);
-                            }
-                        });
+               getChildLocation();
             }
         });
 
@@ -78,6 +68,24 @@ public class ParentActivity extends BaseActivity {
             @Override
             public void onClick(View view) {
                 callAbsentDialog();
+            }
+        });
+
+        findViewById(R.id.update_bus).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isAbsent) return;
+                disposable = ApiService.getPARENT_SERVICE().getDriverLocation(Integer.parseInt(idx))
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Consumer<LatLng>() {
+                            @Override
+                            public void accept(LatLng latLng) {
+                                busLat = latLng.getLat();
+                                busLng = latLng.getLng();
+                                updateMap();
+                            }
+                        });
             }
         });
     }
@@ -91,23 +99,55 @@ public class ParentActivity extends BaseActivity {
         layout_cover_absent.setVisibility(isAbsent ? View.VISIBLE : View.GONE);
     }
 
-    private void processUpdateDriverLocation(LatLng latLng) {
-        double lat = 0, lng = 0;
-        lat += latLng.getLat();
-        lng += latLng.getLng();
-
+    private void processUpdateDriverLocation() {
         BitmapDrawable bitmapdraw=(BitmapDrawable)getResources().getDrawable(R.drawable.mini_bus);
         Bitmap b=bitmapdraw.getBitmap();
         Bitmap smallMarker = Bitmap.createScaledBitmap(b, 110, 110, false);
         map.addMarker( new MarkerOptions().position(
-                new com.google.android.gms.maps.model.LatLng(
-                        latLng.getLat(),
-                        latLng.getLng()
-                )
+                new com.google.android.gms.maps.model.LatLng(busLat, busLng)
                 ).title(String.format("기사위치")).icon(BitmapDescriptorFactory.fromBitmap(smallMarker))
         );
-        center = new com.google.android.gms.maps.model.LatLng(lat, lng);
+    }
+
+    private void processUpdateChildLocation() {
+        map.addMarker( new MarkerOptions().position(
+                new com.google.android.gms.maps.model.LatLng(childLat, childLng)
+                ).title(String.format("아이위치"))
+        );
+    }
+
+    private void updateMap() {
+        map.clear();
+        processUpdateDriverLocation();
+        processUpdateChildLocation();
+        if (busLat != 0 && childLat != 0 && childLat != 0 && childLng != 0) {
+            center = new com.google.android.gms.maps.model.LatLng((busLat + childLat) / (double) 2,
+                    (busLng + childLng) / (double) 2);
+        } else {
+            center = new com.google.android.gms.maps.model.LatLng(busLat + childLat, busLng + childLng);
+        }
         map.animateCamera(CameraUpdateFactory.newLatLngZoom(center, 14));
+    }
+
+    private void getChildLocation() {
+        childLat = 0;
+        childLng = 0;
+        disposableChild = ApiService.getPARENT_SERVICE().getChildLocation(Integer.parseInt(idx))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<ChildLocationResponse>() {
+                    @Override
+                    public void accept(ChildLocationResponse childLocationResponse) {
+                        if (childLocationResponse.who.equals("bus")) {
+                            busLat = childLocationResponse.lat;
+                            busLng = childLocationResponse.lng;
+                        } else {
+                            childLat = childLocationResponse.lat;
+                            childLng = childLocationResponse.lng;
+                        }
+                        updateMap();
+                    }
+                });
     }
 
     private void callAbsentDialog() {
