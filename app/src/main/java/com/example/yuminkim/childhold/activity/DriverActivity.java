@@ -339,6 +339,9 @@ public class DriverActivity extends BaseActivity{
     }
 
     private void driveEnd() {
+        for (Child child : childListForEndDrive) {
+            Log.d("child","child : " + child.getName());
+        }
         CHBluetoothManager.getInstance(this)
                 .driveEndScan(childListForEndDrive,
                         new CHBluetoothManager.DriveEndScanCallback() {

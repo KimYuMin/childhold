@@ -17,4 +17,8 @@
     <color name="white">#E6E6E6</color>
     <color name="gray">#696969</color>
 
+
+    <color name="testy">#F39E19</color>
+    <color name="textb">#3892F2</color>
+    <color name="textr">#FC494D</color>
 </resources>

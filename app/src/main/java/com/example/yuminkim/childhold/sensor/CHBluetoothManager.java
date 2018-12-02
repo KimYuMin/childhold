@@ -10,6 +10,7 @@ import android.bluetooth.le.ScanSettings;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Handler;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.example.yuminkim.childhold.model.Child;
@@ -119,8 +120,10 @@ public class CHBluetoothManager {
             @Override
             public void onScanResult(int callbackType, ScanResult result) {
                 super.onScanResult(callbackType, result);
+                Log.d("find", result.getDevice().getAddress());
                 for (Child c : children) {
-                    if (c.getDeviceId().equals(result.getDevice().getAddress())) {
+                    if (c.getBeaconId().equals(result.getDevice().getAddress())) {
+                        Log.d("find","++");
                         remainChildCount++;
                         break;
                     }

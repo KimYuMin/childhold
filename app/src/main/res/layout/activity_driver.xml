@@ -10,7 +10,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="56dp"
-        android:background="@color/peach_p">
+        android:background="@color/testy">
 
         <ImageButton
             android:id="@+id/back_button"
@@ -52,7 +52,7 @@
             android:textColor="@color/white"
             android:background="#99000000"
             android:textSize="18sp"
-            android:text="next_destnation"/>
+            android:text="다음 목적지가 없습니다."/>
     </FrameLayout>
 
     <FrameLayout
@@ -75,10 +75,11 @@
                 android:gravity="center"
                 android:layout_weight="3"
                 android:textSize="20dp"
-                android:text="아직 운행중이 아닙니다."
-                android:background="#66000000"
-                android:textColor="@color/white"/>
-
+                android:text="2018.12.3(화) \n아직 운행중이 아닙니다."
+                android:background="@color/testy"
+                android:textColor="@color/white"
+                android:textStyle="bold"/>
+            <!-- 66000000-->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
@@ -90,30 +91,30 @@
                 <Button
                     android:layout_width="0dp"
                     android:layout_weight="1"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_gravity="center"
                     android:id="@+id/drive_go_to_school_btn"
                     android:drawableTop="@drawable/icon_school"
                     android:drawablePadding="8dp"
                     android:text="등원시작"
-                    android:layout_marginRight="4dp"
-                    android:layout_marginLeft="4dp"
-                    android:background="@color/orange_p"
-                    android:padding="8dp"/>
+                    android:textSize="20dp"
+                    android:background="@color/textb"
+                    android:paddingTop="24dp"
+                    android:textColor="@color/white"/>
 
                 <Button
                     android:layout_width="0dp"
                     android:layout_weight="1"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_gravity="center"
                     android:id="@+id/drive_go_to_home_btn"
                     android:drawableTop="@drawable/icon_home"
                     android:drawablePadding="8dp"
-                    android:padding="8dp"
                     android:text="하원시작"
-                    android:layout_marginRight="4dp"
-                    android:layout_marginLeft="4dp"
-                    android:background="@color/orange_p"/>
+                    android:textSize="20dp"
+                    android:paddingTop="24dp"
+                    android:textColor="@color/white"
+                    android:background="@color/textr"/>
 
             </LinearLayout>
 
@@ -149,16 +150,18 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:layout_weight="3.5"
+                android:textSize="20dp"
                 android:text="운행이 완료되었습니다. \n남아있는 아이가 있는지 확인 해주세요."/>
 
             <Button
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:id="@+id/drive_end_button"
                 android:text="운행 종료"
+                android:textSize="20dp"
                 android:background="#E9AA0D"
-                android:layout_marginBottom="20dp"/>
+                android:padding="8dp"/>
 
         </LinearLayout>
 
