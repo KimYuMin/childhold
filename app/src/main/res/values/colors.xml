@@ -7,4 +7,14 @@
     <color name="orange">#E9AA0D</color>
 
     <color name="orange_deep">#E9880D</color>
+
+    <color name="orange_p">#E9CA79</color>
+    <color name="peach_p">#E8AE8C</color>
+    <color name="pink_p">#FF90A5</color>
+    <color name="purple_p">#C177E8</color>
+    <color name="blue_p">#8C9AFF</color>
+    <color name="white_orange">#E9E3C5</color>
+    <color name="white">#E6E6E6</color>
+    <color name="gray">#696969</color>
+
 </resources>

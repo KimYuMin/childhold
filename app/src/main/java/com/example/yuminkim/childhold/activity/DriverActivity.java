@@ -8,6 +8,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.content.LocalBroadcastManager;
@@ -17,6 +19,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.yuminkim.childhold.R;
@@ -35,6 +38,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -164,11 +168,13 @@ public class DriverActivity extends BaseActivity{
         @Override
         public void onReceive(Context context, Intent intent) {
             String title = intent.getStringExtra("title");
-            String alert = intent.getStringExtra("alert");
+            final String alert = intent.getStringExtra("alert");
             AlertUtil.showAlert(DriverActivity.this, title, alert, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    getChildList(Integer.parseInt(idx));
+                    if (alert.contains("하차")) {
+                        getChildList(Integer.parseInt(idx));
+                    }
                     dialog.dismiss();
                 }
             }, new DialogInterface.OnClickListener() {
@@ -200,6 +206,7 @@ public class DriverActivity extends BaseActivity{
                             PushMessageUtil.sendPushNotification(curChild.getDeviceId(), curChild.getName(), true);
                             childArrayList.remove(curChild);
                             childListAdapter.notifyDataSetChanged();
+                            updateNextLocatinoText();
                         }
                     }
                 } else {
@@ -317,6 +324,7 @@ public class DriverActivity extends BaseActivity{
                             postMapProcess();
                         }
                         childListAdapter.notifyDataSetChanged();
+                        updateNextLocatinoText();
                     }
                 }, new Consumer<Throwable>() {
                     @Override
@@ -378,6 +386,23 @@ public class DriverActivity extends BaseActivity{
 
         if (childLocationUpdateDisposable != null) {
             childLocationUpdateDisposable.dispose();
+        }
+    }
+
+    private void updateNextLocatinoText() {
+        TextView nextDestText = findViewById(R.id.next_destination_text);
+        String location = "";
+        if (childArrayList.size() <= 0) {
+            nextDestText.setText("다음 목적지가 없습니다.");
+        } else {
+            Geocoder geocoder = new Geocoder(this);
+            try {
+                Address address = geocoder.getFromLocation(childArrayList.get(0).getLatLng().getLat(), childArrayList.get(0).getLatLng().getLng(), 1).get(0);
+                location = address.getLocality() + " " + address.getThoroughfare() + " " +  address.getFeatureName().trim() ;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            nextDestText.setText(location);
         }
     }
 }
