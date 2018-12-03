@@ -20,6 +20,28 @@ public class ChildListAdapter extends BaseAdapter {
     Context context;
     ArrayList<Child> childArrayList;
     TextView child_name, child_location, index;
+    private int[] colors = {
+            R.color.pink_p,
+            R.color.purple_p,
+            R.color.blue_p,
+            R.color.peach_p,
+            R.color.orange_p,
+            R.color.pink_p,
+            R.color.purple_p,
+            R.color.blue_p,
+            R.color.peach_p,
+            R.color.orange_p,
+            R.color.pink_p,
+            R.color.purple_p,
+            R.color.blue_p,
+            R.color.peach_p,
+            R.color.orange_p,
+            R.color.pink_p,
+            R.color.purple_p,
+            R.color.blue_p,
+            R.color.peach_p,
+            R.color.orange_p,
+    };
 
     public ChildListAdapter(Context context, ArrayList<Child> childArrayList) {
         this.context = context;
@@ -60,6 +82,7 @@ public class ChildListAdapter extends BaseAdapter {
             e.printStackTrace();
         }
         index.setText(String.format("%d", i + 1));
+        index.setBackgroundColor(context.getResources().getColor(colors[Integer.parseInt(childArrayList.get(i).getParentId())]));
         child_location.setText(location);
         child_name.setText(childArrayList.get(i).getName());
         return view;
