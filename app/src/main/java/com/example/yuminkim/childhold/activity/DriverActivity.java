@@ -172,7 +172,7 @@ public class DriverActivity extends BaseActivity{
             AlertUtil.showAlert(DriverActivity.this, title, alert, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    if (alert.contains("하차")) {
+                    if (alert.contains("탑승")) {
                         getChildList(Integer.parseInt(idx));
                     }
                     dialog.dismiss();
