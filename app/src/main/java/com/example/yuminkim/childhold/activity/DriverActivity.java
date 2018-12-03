@@ -64,11 +64,11 @@ public class DriverActivity extends BaseActivity{
     LocationTracker locationTracker;
     public Handler mHandler;
 
-
     private LinearLayout driveDefaultContainer;
     private LinearLayout driveDriveContainer;
     private LinearLayout driveEndContainer;
     ProgressDialog progressDialog;
+    boolean isGoToSchool = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,6 +113,7 @@ public class DriverActivity extends BaseActivity{
                 double lat = locationTracker.getLat();
                 double lng = locationTracker.getLng();
                 Toast.makeText(getApplicationContext(), "LOCATION : " + lat + " " + lng, Toast.LENGTH_SHORT).show();
+                isGoToSchool = true;
             }
         });
 
@@ -136,9 +137,9 @@ public class DriverActivity extends BaseActivity{
                         map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16));
                     }
                 });
-                startBeaconScanForGoToSchool(0);
                 locationTracker = new LocationTracker(DriverActivity.this, mHandler, idx);
-                startBeaconScanForHome();
+                startBeaconScanForHome(0);
+                isGoToSchool = false;
             }
         });
 
@@ -156,7 +157,11 @@ public class DriverActivity extends BaseActivity{
         scanButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startBeaconScanForGoToSchool(3000);
+                if (isGoToSchool) {
+                    startBeaconScanForGoToSchool(3000);
+                } else {
+                    startBeaconScanForHome(3000);
+                }
             }
         });
     }
@@ -241,7 +246,7 @@ public class DriverActivity extends BaseActivity{
         }
     }
 
-    private void startBeaconScanForHome() { // 여기가 비콘스캔인데...
+    private void startBeaconScanForHome(long time) { // 여기가 비콘스캔인데...
         locationTracker.getLocation();
         final ArrayList<Child> childListForExit_copy = new ArrayList<>(childListForExit);
         CHBluetoothManager.getInstance(this).scanLeDeviceForExit(true, new ScanCallback() {
@@ -295,8 +300,7 @@ public class DriverActivity extends BaseActivity{
                     }
                 }
             }
-        });
-
+        }, time);
     }
 
     @Override

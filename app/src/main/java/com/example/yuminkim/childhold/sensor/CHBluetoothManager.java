@@ -83,22 +83,7 @@ public class CHBluetoothManager {
         }
     }
 
-    public void scanLeDevice(final boolean enable, final ScanCallback scanCallback) {
-        if (enable) {
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    leScanner.stopScan(scanCallback);
-                }
-            }, SCAN_PERIOD);
-
-            leScanner.startScan(filters, settings, scanCallback);
-        } else {
-            leScanner.stopScan(scanCallback);
-        }
-    }
-
-    public void scanLeDeviceForExit(final boolean enable, final ScanCallback scanCallback, final DriveEndScanCallback stopScanCallback) {
+    public void scanLeDeviceForExit(final boolean enable, final ScanCallback scanCallback, final DriveEndScanCallback stopScanCallback, long time) {
         if (enable) {
             handler.postDelayed(new Runnable() {
                 @Override
@@ -106,7 +91,7 @@ public class CHBluetoothManager {
                     leScanner.stopScan(scanCallback);
                     stopScanCallback.scanEnd();
                 }
-            }, SCAN_PERIOD);
+            }, (time == 0) ? SCAN_PERIOD : time);
 
             leScanner.startScan(filters, settings, scanCallback);
         } else {
