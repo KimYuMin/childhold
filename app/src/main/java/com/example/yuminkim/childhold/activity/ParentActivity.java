@@ -165,7 +165,7 @@ public class ParentActivity extends BaseActivity {
                                 .subscribe(new Consumer<AbsentResponse>() {
                                     @Override
                                     public void accept(AbsentResponse absentResponse) {
-                                        PushMessageUtil.sendAbsentPushNotification(absentResponse.driverId, idx, childName, isAbsent);
+                                        PushMessageUtil.sendAbsentPushNotification(absentResponse.driverId, idx, childName, !isAbsent);
                                     }
                                 });
                         dialogInterface.dismiss();
