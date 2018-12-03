@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -59,6 +60,7 @@ public class DriverActivity extends BaseActivity{
     private Disposable childLocationUpdateDisposable;
     private com.google.android.gms.maps.model.LatLng center;
     private String idx;
+    private ImageButton scanButton;
     LocationTracker locationTracker;
     public Handler mHandler;
 
@@ -80,6 +82,7 @@ public class DriverActivity extends BaseActivity{
         driveDefaultContainer = findViewById(R.id.driver_default);
         driveDriveContainer = findViewById(R.id.driver_drive);
         driveEndContainer = findViewById(R.id.drive_end_container);
+        scanButton = findViewById(R.id.scan_button);
 
         mHandler = new Handler();
         driveForGoToSchool = findViewById(R.id.drive_go_to_school_btn);
@@ -90,6 +93,7 @@ public class DriverActivity extends BaseActivity{
             public void onClick(View view) {
                 driveDefaultContainer.setVisibility(View.GONE);
                 driveDriveContainer.setVisibility(View.VISIBLE);
+                scanButton.setVisibility(View.VISIBLE);
                 driveEndContainer.setVisibility(View.GONE);
 
                 childlist_view = findViewById(R.id.child_list);
@@ -104,7 +108,7 @@ public class DriverActivity extends BaseActivity{
                         map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16));
                     }
                 });
-                startBeaconScanForGoToSchool();
+                startBeaconScanForGoToSchool(0);
                 locationTracker = new LocationTracker(DriverActivity.this, mHandler, idx);
                 double lat = locationTracker.getLat();
                 double lng = locationTracker.getLng();
@@ -117,6 +121,7 @@ public class DriverActivity extends BaseActivity{
             public void onClick(View v) {
                 driveDefaultContainer.setVisibility(View.GONE);
                 driveDriveContainer.setVisibility(View.VISIBLE);
+                scanButton.setVisibility(View.VISIBLE);
                 driveEndContainer.setVisibility(View.GONE);
 
                 childlist_view = findViewById(R.id.child_list);
@@ -131,7 +136,7 @@ public class DriverActivity extends BaseActivity{
                         map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16));
                     }
                 });
-                startBeaconScanForGoToSchool();
+                startBeaconScanForGoToSchool(0);
                 locationTracker = new LocationTracker(DriverActivity.this, mHandler, idx);
                 startBeaconScanForHome();
             }
@@ -145,6 +150,13 @@ public class DriverActivity extends BaseActivity{
                 progressDialog.create();
                 progressDialog.show();
                 driveEnd();
+            }
+        });
+
+        scanButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startBeaconScanForGoToSchool(3000);
             }
         });
     }
@@ -188,32 +200,11 @@ public class DriverActivity extends BaseActivity{
 
 
     //TODO: Check Bluetooth is ON?
-    private void startBeaconScanForGoToSchool() { // 여기가 비콘스캔인데...
+    private void startBeaconScanForGoToSchool(long time) {
         CHBluetoothManager.getInstance(this).scanLeDevice(true, new ScanCallback() {
             @Override
             public void onScanResult(int callbackType, ScanResult result) {
-                if (!childArrayList.isEmpty()) {
-                    String curDeviceId = result.getDevice().getAddress();
-                    if (curDeviceId != null) {
-                        Child curChild = null;
-                        for (Child child : childArrayList) {
-                            if (child.getBeaconId().equals(curDeviceId)) {
-                                curChild = child;
-                                break;
-                            }
-                        }
-                        if (curChild != null) {
-                            PushMessageUtil.sendPushNotification(curChild.getDeviceId(), curChild.getName(), true);
-                            childArrayList.remove(curChild);
-                            childListAdapter.notifyDataSetChanged();
-                            updateNextLocatinoText();
-                        }
-                    }
-                } else {
-                    driveDefaultContainer.setVisibility(View.GONE);
-                    driveDriveContainer.setVisibility(View.GONE);
-                    driveEndContainer.setVisibility(View.VISIBLE);
-                }
+                processScanResult(result);
             }
 
             @Override
@@ -221,7 +212,33 @@ public class DriverActivity extends BaseActivity{
 
             @Override
             public void onScanFailed(int errorCode) { }
-        });
+        }, time);
+    }
+
+    private void processScanResult(ScanResult result) {
+        if (!childArrayList.isEmpty()) {
+            String curDeviceId = result.getDevice().getAddress();
+            if (curDeviceId != null) {
+                Child curChild = null;
+                for (Child child : childArrayList) {
+                    if (child.getBeaconId().equals(curDeviceId)) {
+                        curChild = child;
+                        break;
+                    }
+                }
+                if (curChild != null) {
+                    PushMessageUtil.sendPushNotification(curChild.getDeviceId(), curChild.getName(), true);
+                    childArrayList.remove(curChild);
+                    childListAdapter.notifyDataSetChanged();
+                    updateNextLocatinoText();
+                }
+            }
+        } else {
+            driveDefaultContainer.setVisibility(View.GONE);
+            driveDriveContainer.setVisibility(View.GONE);
+            driveEndContainer.setVisibility(View.VISIBLE);
+            scanButton.setVisibility(View.GONE);
+        }
     }
 
     private void startBeaconScanForHome() { // 여기가 비콘스캔인데...
@@ -274,6 +291,7 @@ public class DriverActivity extends BaseActivity{
                         driveDefaultContainer.setVisibility(View.GONE);
                         driveDriveContainer.setVisibility(View.GONE);
                         driveEndContainer.setVisibility(View.VISIBLE);
+                        scanButton.setVisibility(View.GONE);
                     }
                 }
             }
@@ -366,6 +384,7 @@ public class DriverActivity extends BaseActivity{
                             driveDefaultContainer.setVisibility(View.VISIBLE);
                             driveDriveContainer.setVisibility(View.GONE);
                             driveEndContainer.setVisibility(View.GONE);
+                            scanButton.setVisibility(View.GONE);
                         }
                     }, 1000);
                 } else {

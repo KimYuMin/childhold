@@ -68,6 +68,21 @@ public class CHBluetoothManager {
         filters = new ArrayList<>();
     }
 
+    public void scanLeDevice(final boolean enable, final ScanCallback scanCallback, long time) {
+        if (enable) {
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    leScanner.stopScan(scanCallback);
+                }
+            }, (time == 0) ? SCAN_PERIOD : time);
+
+            leScanner.startScan(filters, settings, scanCallback);
+        } else {
+            leScanner.stopScan(scanCallback);
+        }
+    }
+
     public void scanLeDevice(final boolean enable, final ScanCallback scanCallback) {
         if (enable) {
             handler.postDelayed(new Runnable() {

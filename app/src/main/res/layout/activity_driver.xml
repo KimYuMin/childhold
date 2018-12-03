@@ -28,6 +28,17 @@
             android:textSize="18dp"
             android:layout_centerInParent="true"/>
 
+        <ImageButton
+            android:id="@+id/scan_button"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="8dp"
+            android:visibility="gone"
+            android:background="@drawable/icon_scan_beacon"/>
+
+
     </RelativeLayout>
 
     <FrameLayout
